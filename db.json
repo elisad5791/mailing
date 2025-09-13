@@ -1,0 +1,55 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "email": "admin@mail.com",
+      "password": "$2a$10$KssILxWNR6k62B7yiX0GAe2Q7wwHlrzhF3LqtVvpyvHZf0MwvNfVu"
+    }
+  ],
+  "mailings": [
+    {
+      "id": "a1b2c3",
+      "name": "Приветственное SMS",
+      "type": "sms",
+      "status": "completed",
+      "recipients": ["+79001112233", "+79004445566"],
+      "text": "Добро пожаловать в наш сервис, {{name}}!",
+      "createdAt": "2023-10-25T08:00:00.000Z"
+    },
+    {
+      "id": "d4e5f6",
+      "name": "Акция октября",
+      "type": "email",
+      "status": "draft",
+      "recipients": ["user1@mail.com", "user2@mail.com"],
+      "subject": "Скидка 20% весь октябрь!",
+      "body": "<h1>Успейте купить!</h1><p>Только до конца месяца действует скидка на все товары.</p>",
+      "createdAt": "2023-10-20T14:30:00.000Z"
+    }
+  ],
+  "templates": [
+    {
+      "id": 1,
+      "name": "Стандартное приветствие (SMS)",
+      "type": "sms",
+      "text": "Рады приветствовать вас, {{name}}! Ваш код: {{code}}."
+    },
+    {
+      "id": 2,
+      "name": "Новостная рассылка (Email)",
+      "type": "email",
+      "subject": "Наши новости за {{month}}",
+      "body": "<p>Здравствуйте, {{name}}! Вот что у нас нового.</p>"
+    }
+  ],
+  "stats": {
+    "totalMailings": 145,
+    "mailingsToday": 5,
+    "deliveredSms": 1280,
+    "deliveredEmails": 5642,
+    "chartData": {
+      "lastWeek": [15, 12, 8, 10, 5, 9, 11],
+      "lastMonth": [45, 52, 48, 60, 55, 58, 45, 50, 48, 52, 60, 55]
+    }
+  }
+}
