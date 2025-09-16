@@ -14,6 +14,8 @@
       "status": "completed",
       "recipients": ["+79001112233", "+79004445566"],
       "text": "Добро пожаловать в наш сервис, {{name}}!",
+      "templateName": "Стандартное приветствие (SMS)",
+      "stats": { "total": 2, "delivered": 1, "failed": 1 },
       "createdAt": "2023-10-25T08:00:00.000Z"
     },
     {
@@ -24,6 +26,7 @@
       "recipients": ["user1@mail.com", "user2@mail.com"],
       "subject": "Скидка 20% весь октябрь!",
       "body": "<h1>Успейте купить!</h1><p>Только до конца месяца действует скидка на все товары.</p>",
+      "templateName": "Новостная рассылка (Email)",
       "createdAt": "2023-10-20T14:30:00.000Z"
     }
   ],

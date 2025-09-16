@@ -1,21 +1,21 @@
-import axios from 'axios'
-import { useAuthStore } from '../stores/auth.js'
+import axios from 'axios';
+import { useAuthStore } from '../stores/auth.js';
 
 export const apiClient = axios.create({
   baseURL: 'http://localhost:3001',
   headers: { 'Content-Type': 'application/json' }
-})
+});
 
 apiClient.interceptors.request.use(
   function(config) {
-    const authStore = useAuthStore()
+    const authStore = useAuthStore();
     if (authStore.token) {
-      config.headers.Authorization = `Bearer ${authStore.token}`
+      config.headers.Authorization = `Bearer ${authStore.token}`;
     }
-    return config
+    return config;
   },
   function (error) {
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
 )
 
@@ -25,9 +25,9 @@ apiClient.interceptors.response.use(
   },
   function(error) {
     if (error.response?.status === 401) {
-      const authStore = useAuthStore()
-      authStore.logout()
+      const authStore = useAuthStore();
+      authStore.logout();
     }
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
 )
