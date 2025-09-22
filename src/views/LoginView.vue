@@ -7,7 +7,9 @@ const router = useRouter();
 const authStore = useAuthStore();
 
 const isLoading = ref(false);
-const errorMessage = ref('');
+
+const formRef = ref(null);
+const formError = ref('');
 
 const form = ref({
   email: "",
@@ -15,14 +17,20 @@ const form = ref({
 });
 
 async function handleSubmit() {
+  const { valid } = await formRef.value.validate();
+  if (!valid) {
+    formError.value = 'Ошибка заполнения формы';
+    return;
+  }
+
   isLoading.value = true;
-  errorMessage.value = "";
+  formError.value = "";
 
   try {
     await authStore.login(form.value);
     router.push("/");
   } catch (error) {
-    errorMessage.value = error.response?.data?.message || 'Произошла ошибка при входе';
+    formError.value = error.response?.data?.message || 'Произошла ошибка при входе';
     console.error('Login error:', error);
   } finally {
     isLoading.value = false;
@@ -52,9 +60,10 @@ const passwordRules = ref([
   <h1>Вход в кабинет</h1>
 
   <v-sheet class="mx-auto" width="300">
-    <v-alert :text="errorMessage" type="error" class="mb-4" v-if="errorMessage"></v-alert>
-
-    <v-form fast-fail @submit.prevent="handleSubmit">
+    <v-form @submit.prevent="handleSubmit" ref="formRef">
+      <div v-if="formError" class="my-2">
+        <v-alert :text="formError" type="error" variant="tonal"></v-alert>
+      </div>
       <v-text-field v-model="form.email" :rules="emailRules" label="Email" :disabled="isLoading"></v-text-field>
       <v-text-field v-model="form.password" :rules="passwordRules" label="Пароль" type="password" class="mt-2" :disabled="isLoading">
       </v-text-field>

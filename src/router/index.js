@@ -4,7 +4,7 @@ import LoginView from '../views/LoginView.vue'
 import MailingsView from '../views/MailingsView.vue'
 import TemplatesView from '../views/TemplatesView.vue'
 import SettingsView from '../views/SettingsView.vue'
-import MailingsCreate from '../components/MailingsCreate.vue';
+import MailingForm from '../components/MailingForm.vue';
 import MailingsShow from '../components/MailingsShow.vue';
 import { useAuthStore } from '../stores/auth.js';
 
@@ -25,8 +25,9 @@ const routes = [
     path: '/mailings',
     children: [
       { path: '', name: 'mailings', component: MailingsView },
-      { path: 'create', component: MailingsCreate },
+      { path: 'create', component: MailingForm },
       { path: ':id', component: MailingsShow },
+      { path: 'edit/:id', component: MailingForm }
     ],
     meta: { requiresAuth: true }
   },

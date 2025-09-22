@@ -43,7 +43,7 @@ async function handleDelete() {
         <v-card color="primary" variant="outlined" class="mx-auto mt-4">
           <v-card-item>
             <div class="text-overline mb-4">
-              Шаблон: {{ currentMailing.templateName }}
+              Шаблон: {{ currentMailing.templateId }}
             </div>
             <div class="text-h5 mb-4">
               {{ currentMailing.name }}
@@ -63,18 +63,6 @@ async function handleDelete() {
             </div>
 
             <p class="my-2">Создана: {{ formatDate(currentMailing.createdAt) }}</p>
-
-            <div class="border-t-sm border-b-sm border-primary py-4" v-if="currentMailing.type == 'sms'">
-              {{ currentMailing.text }}
-            </div>
-            <div class="border-t-sm border-b-sm border-primary py-4" v-else>
-              <div>
-                <v-icon icon="mdi-bell" />
-                {{ currentMailing.subject }}
-                <v-icon icon="mdi-bell" />
-              </div>
-              <div class="mt-2">{{ currentMailing.body }}</div>
-            </div>
 
             <div class="text-h6 mt-4" v-if="currentMailing.stats">Статистика отправки</div>
             <v-chip-group v-if="currentMailing.stats">

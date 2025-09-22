@@ -45,7 +45,7 @@ async function handleDelete(id) {
       Рассылок пока нет.
     </div>
 
-    <v-table style="min-width:1000px" v-else>
+    <v-table style="min-width:1200px" v-else>
       <thead>
         <tr>
           <th class="text-left font-weight-bold">Название</th>
@@ -70,13 +70,16 @@ async function handleDelete(id) {
             <span>
               <v-icon icon="mdi-check" v-if="mailing.status == 'completed'" />
               <v-icon icon="mdi-clock-edit-outline" v-else />
-              {{ statusRussian(mailing.status)] }}
+              {{ statusRussian(mailing.status) }}
             </span>
           </td>
           <td>{{ mailing.recipients.length }}</td>
           <td>{{ formatDate(mailing.createdAt) }}</td>
           <td class="actions">
             <v-btn size="small" color="primary" variant="tonal" :to="'/mailings/'+mailing.id">Просмотр</v-btn>
+            <v-btn size="small" color="success" variant="tonal" :to="'/mailings/edit/'+mailing.id" class="ms-2">
+              Редактировать
+            </v-btn>
             <v-btn size="small" color="error" variant="tonal" @click="handleDelete(mailing.id)" class="ms-2">
               Удалить
             </v-btn>

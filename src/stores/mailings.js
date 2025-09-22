@@ -54,5 +54,36 @@ export const useMailingsStore = defineStore('mailings', function () {
     }
   }
 
-  return { mailings, currentMailing, loading, error, fetchMailings, fetchMailingById, deleteMailing };
+  async function createMailing(data) {
+    loading.value = true;
+    data.recipients = data.recipients.split(',').map(item => item.trim());
+    data.status = 'draft';
+    data.createdAt = new Date();
+    try {
+      await apiClient.post('/mailings', data);
+    } catch (err) {
+      console.error('Ошибка при создании рассылки:', err);
+      error.value = err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  async function updateMailing({ id, data }) {
+    loading.value = true;
+    data.recipients = data.recipients.split(',').map(item => item.trim());
+    try {
+      await apiClient.patch(`/mailings/${id}`, data);
+      if (currentMailing.value?.id === id) {
+        currentMailing.value = { ...currentMailing.value, ...data };
+      }
+    } catch (err) {
+      console.error('Ошибка при обновлении рассылки:', err);
+      error.value = err;
+    } finally {
+      loading.value = false;
+    }
+  }
+
+  return { mailings, currentMailing, loading, error, fetchMailings, fetchMailingById, deleteMailing, createMailing, updateMailing };
 });
