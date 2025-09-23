@@ -6,22 +6,14 @@ import { statusRussian, formatDate } from '../utils/helpers.js';
 import { storeToRefs } from 'pinia';
 
 const route = useRoute();
-const router = useRouter();
 
 const mailingsStore = useMailingsStore();
 const { currentMailing , loading, error } = storeToRefs(mailingsStore);
-const { fetchMailingById, deleteMailing } = mailingsStore;
+const { fetchMailingById } = mailingsStore;
 
 onMounted(async function() {
   await fetchMailingById(route.params.id);
 });
-
-async function handleDelete() {
-    const success = await deleteMailing(currentMailing.value.id);
-    if (success) {
-      router.push('/mailings');
-    }
-}
 </script>
 
 <template>
@@ -40,11 +32,9 @@ async function handleDelete() {
 
     <v-row v-else>
       <v-col md="8" lg="6" class="mx-auto">
-        <v-card color="primary" variant="outlined" class="mx-auto mt-4">
+        <v-card class="mx-auto mt-4">
           <v-card-item>
-            <div class="text-overline mb-4">
-              Шаблон: {{ currentMailing.templateId }}
-            </div>
+            <div class="text-overline mb-4">Рассылка</div>
             <div class="text-h5 mb-4">
               {{ currentMailing.name }}
             </div>
@@ -62,6 +52,10 @@ async function handleDelete() {
               </p>
             </div>
 
+            <div class="mt-2">
+              Шаблон: {{ currentMailing.templateId }}
+            </div>
+
             <p class="my-2">Создана: {{ formatDate(currentMailing.createdAt) }}</p>
 
             <div class="text-h6 mt-4" v-if="currentMailing.stats">Статистика отправки</div>
@@ -70,10 +64,6 @@ async function handleDelete() {
               <v-chip>Успешно: {{ currentMailing.stats.delivered }}</v-chip>
               <v-chip>Ошибки: {{ currentMailing.stats.failed }}</v-chip>
             </v-chip-group>
-
-            <v-card-actions>
-              <v-btn color="error" variant="tonal" size="small" @click="handleDelete(currentMailing.id)">Удалить рассылку</v-btn>
-            </v-card-actions>
 
             <v-list>
               <div class="font-weight-bold">ПОЛУЧАТЕЛИ</div>

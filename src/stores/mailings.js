@@ -58,7 +58,7 @@ export const useMailingsStore = defineStore('mailings', function () {
     loading.value = true;
     data.recipients = data.recipients.split(',').map(item => item.trim());
     data.status = 'draft';
-    data.createdAt = new Date();
+    data.createdAt = new Date().toISOString();
     try {
       await apiClient.post('/mailings', data);
     } catch (err) {

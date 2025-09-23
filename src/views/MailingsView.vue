@@ -10,8 +10,8 @@ const mailingsStore = useMailingsStore();
 const { mailings, loading, error } = storeToRefs(mailingsStore);
 const { fetchMailings, deleteMailing } = mailingsStore;
 
-onMounted(function() {
-  mailingsStore.fetchMailings()
+onMounted(async function() {
+  await fetchMailings();
 });
 
 async function handleDelete(id) {

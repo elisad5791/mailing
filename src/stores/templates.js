@@ -46,5 +46,60 @@ export const useTemplatesStore = defineStore('templates', function() {
     }
   }
 
-  return { templates, isLoading, error, emailTemplates, smsTemplates, fetchTemplates, currentTemplate, fetchTemplateById };
+  async function deleteTemplate(id) {
+    try {
+      await apiClient.delete(`/templates/${id}`)
+      templates.value = templates.value.filter(template => template.id !== id);
+      if (currentTemplate.value?.id === id) {
+        currentTemplate.value = null;
+      }
+      return true;
+    } catch (error) {
+      console.error(`Ошибка при удалении шаблона с ID ${id}:`, error);
+      error.value = 'Не удалось удалить шаблон';
+      return false;
+    }
+  }
+
+  async function createTemplate(data) {
+    isLoading.value = true;
+    data.createdAt = new Date().toISOString();
+    try {
+      await apiClient.post('/templates', data);
+    } catch (err) {
+      console.error('Ошибка при создании шаблона:', err);
+      error.value = err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  async function updateTemplate({ id, data }) {
+    isLoading.value = true;
+    try {
+      await apiClient.patch(`/templates/${id}`, data);
+      if (currentTemplate.value?.id === id) {
+        currentTemplate.value = { ...currentTemplate.value, ...data };
+      }
+    } catch (err) {
+      console.error('Ошибка при обновлении шаблона:', err);
+      error.value = err;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  return { 
+    templates, 
+    isLoading, 
+    error, 
+    emailTemplates, 
+    smsTemplates, 
+    fetchTemplates, 
+    currentTemplate, 
+    fetchTemplateById, 
+    deleteTemplate,
+    createTemplate,
+    updateTemplate
+  };
 });

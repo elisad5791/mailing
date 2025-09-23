@@ -13,7 +13,7 @@ const mailingId = ref(route.params.id);
 
 const mailingsStore = useMailingsStore();
 const { loading, error, currentMailing } = storeToRefs(mailingsStore);
-const { createMailing, updateMailing } = mailingsStore;
+const { createMailing, updateMailing, fetchMailingById } = mailingsStore;
 
 const templatesStore = useTemplatesStore();
 const { emailTemplates, smsTemplates } = storeToRefs(templatesStore);
@@ -62,7 +62,7 @@ function processCsv(event) {
 onMounted(async () => {
   await fetchTemplates();
   if (isEditing.value) {
-    await mailingsStore.fetchMailingById(mailingId.value);
+    await fetchMailingById(mailingId.value);
     setTimeout(() => {
       name.value = currentMailing.value.name;
       type.value = currentMailing.value.type;
@@ -87,9 +87,9 @@ async function handleSubmit() {
   };
   try {
     if (isEditing.value) {
-      await mailingsStore.updateMailing({ id: mailingId.value, data: values });
+      await updateMailing({ id: mailingId.value, data: values });
     } else {
-      await mailingsStore.createMailing(values);
+      await createMailing(values);
     }
     router.push('/mailings');
   } catch (error) {

@@ -1,11 +1,13 @@
-import { createRouter, createWebHistory } from 'vue-router'
-import DashboardView from '../views/DashboardView.vue'
-import LoginView from '../views/LoginView.vue'
-import MailingsView from '../views/MailingsView.vue'
-import TemplatesView from '../views/TemplatesView.vue'
-import SettingsView from '../views/SettingsView.vue'
+import { createRouter, createWebHistory } from 'vue-router';
+import DashboardView from '../views/DashboardView.vue';
+import LoginView from '../views/LoginView.vue';
+import MailingsView from '../views/MailingsView.vue';
+import TemplatesView from '../views/TemplatesView.vue';
+import SettingsView from '../views/SettingsView.vue';
 import MailingForm from '../components/MailingForm.vue';
-import MailingsShow from '../components/MailingsShow.vue';
+import TemplateForm from '../components/TemplateForm.vue';
+import MailingShow from '../components/MailingShow.vue';
+import TemplateShow from '../components/TemplateShow.vue';
 import { useAuthStore } from '../stores/auth.js';
 
 const routes = [
@@ -26,15 +28,19 @@ const routes = [
     children: [
       { path: '', name: 'mailings', component: MailingsView },
       { path: 'create', component: MailingForm },
-      { path: ':id', component: MailingsShow },
+      { path: ':id', component: MailingShow },
       { path: 'edit/:id', component: MailingForm }
     ],
     meta: { requiresAuth: true }
   },
   {
     path: '/templates',
-    name: 'templates',
-    component: TemplatesView,
+    children: [
+      { path: '', name: 'templates', component: TemplatesView },
+      { path: 'create', component: TemplateForm },
+      { path: ':id', component: TemplateShow },
+      { path: 'edit/:id', component: TemplateForm }
+    ],
     meta: { requiresAuth: true }
   },
   {
