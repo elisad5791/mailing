@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useTemplatesStore } from '../stores/templates.js';
 import { storeToRefs } from 'pinia';
+import EmailEditor from './EmailEditor.vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -123,7 +124,9 @@ const subjectRules = ref([
 
         <v-text-field v-model="subject" label="Тема" :rules="subjectRules" clearable v-if="type == 'email'"></v-text-field>
 
-        <v-textarea label="Содержание" class="mt-4" v-model="body" :rules="bodyRules"></v-textarea>
+        <EmailEditor  v-model="body" v-if="type == 'email'" />
+        <v-textarea label="Содержание" class="mt-4" v-model="body" :rules="bodyRules" v-else></v-textarea>
+        
         <div v-if="type == 'sms'">Символов: {{ body.length }} / 200</div>
         <div v-pre>
           Используйте переменные в двойных фигурных скобках,<br>например: {{name}}.
