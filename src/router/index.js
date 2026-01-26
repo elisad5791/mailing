@@ -5,6 +5,7 @@ import MailingsView from '../views/MailingsView.vue';
 import TemplatesView from '../views/TemplatesView.vue';
 import SettingsView from '../views/SettingsView.vue';
 import MailingForm from '../components/MailingForm.vue';
+import MailingScheduler from '../components/MailingScheduler.vue';
 import TemplateForm from '../components/TemplateForm.vue';
 import MailingShow from '../components/MailingShow.vue';
 import TemplateShow from '../components/TemplateShow.vue';
@@ -29,7 +30,8 @@ const routes = [
       { path: '', name: 'mailings', component: MailingsView },
       { path: 'create', component: MailingForm },
       { path: ':id', component: MailingShow },
-      { path: 'edit/:id', component: MailingForm }
+      { path: 'edit/:id', component: MailingForm },
+      { path: 'schedule/:id', component: MailingScheduler },
     ],
     meta: { requiresAuth: true }
   },

@@ -89,6 +89,7 @@ async function handleSubmit() {
     if (isEditing.value) {
       await updateMailing({ id: mailingId.value, data: values });
     } else {
+      values.status = 'draft';
       await createMailing(values);
     }
     router.push('/mailings');
@@ -169,8 +170,13 @@ const recRules = ref([
         <v-textarea label="Получатели (через запятую)" class="mt-4" v-model="recipients" :rules="recRules"></v-textarea>
 
         <div class="px-2 py-2 d-flex justify-space-between">
-          <v-btn type="submit" color="primary" :disabled="loading">{{ isEditing ? 'Обновить' : 'Создать' }}</v-btn>
-          <v-btn type="button" @click="$router.push('/mailings')">Отменить</v-btn>
+          <div>
+            <v-btn :to="'/mailings/schedule/'+mailingId" color="success" v-if="isEditing">Планировщик</v-btn>
+          </div>
+          <div>
+            <v-btn type="submit" color="primary" :disabled="loading">{{ isEditing ? 'Обновить' : 'Создать' }}</v-btn>
+            <v-btn type="button" class="ml-3" @click="$router.push('/mailings')">Отменить</v-btn>
+          </div>
         </div>
       </v-responsive>
     </v-form>

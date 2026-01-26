@@ -2,9 +2,12 @@
 import { ref, onMounted } from 'vue';
 import { useMailingsStore } from '../stores/mailings';
 import { storeToRefs } from 'pinia';
-import { statusRussian, formatDate } from '../utils/helpers.js';
+import { formatDate } from '../utils/helpers.js';
+import { statuses } from '../data/statuses';
+import { scheduleTypes } from '../data/types';
 
 const deleting = ref(false);
+const isExecuting = ref(false);
 
 const mailingsStore = useMailingsStore();
 const { mailings, loading, error } = storeToRefs(mailingsStore);
@@ -20,12 +23,25 @@ async function handleDelete(id) {
     deleting.value = true;
   }
 }
+
+function handleAction(id) {
+  const mailing = mailings.value.find((item) => item.id == id);
+  const timeout = statuses[mailing['status']]['action_time'] * 1000;
+
+  isExecuting.value = true;
+  setTimeout(() => { 
+    isExecuting.value = false; 
+    const scheduleType = mailing['scheduleType'];
+    const newStatus = statuses[mailing['status']]['status_after_action'][scheduleType];
+    mailing['status'] = newStatus;
+  }, timeout); 
+}
 </script>
 
 <template>
   <RouterView />
 
-   <div class="overflow-auto">
+   <div>
     <div>
       <h1>Управление рассылками</h1>
       <v-btn to="/mailings/create" color="primary" class="my-2">Создать</v-btn>
@@ -64,13 +80,16 @@ async function handleDelete(id) {
               <v-icon icon="mdi-message-processing" v-if="mailing.type == 'sms'"/>
               <v-icon icon="mdi-email" v-else />
               {{ mailing.type.toUpperCase() }}
+              <v-icon icon="mdi-arrow-up-bold-outline" v-if="mailing.scheduleType == 'immediate'"/>
+              <v-icon icon="mdi-clock-outline" v-else-if="mailing.scheduleType == 'scheduled'"/>
+              <v-icon icon="mdi-autorenew" v-else />
+              {{ scheduleTypes[mailing.scheduleType].translation }}
             </span>
           </td>
           <td>
             <span>
-              <v-icon icon="mdi-check" v-if="mailing.status == 'completed'" />
-              <v-icon icon="mdi-clock-edit-outline" v-else />
-              {{ statusRussian(mailing.status) }}
+              <v-icon :icon="statuses[mailing.status]['icon']" />
+              {{ statuses[mailing.status]['translation'] }}
             </span>
           </td>
           <td>{{ mailing.recipients.length }}</td>
@@ -83,9 +102,21 @@ async function handleDelete(id) {
             <v-btn size="small" color="error" variant="tonal" @click="handleDelete(mailing.id)" class="ms-2">
               Удалить
             </v-btn>
+            <v-btn size="small" color="warning" variant="tonal" @click="handleAction(mailing.id)" class="ms-2">
+              {{ statuses[mailing.status]['action'] }}
+            </v-btn>
           </td>
         </tr>
       </tbody>
     </v-table>
+
+    <div class="text-center mt-5" v-if="isExecuting">
+      <v-progress-circular
+        :size="70"
+        :width="7"
+        color="primary"
+        indeterminate
+      ></v-progress-circular>
+    </div>
   </div>
 </template>

@@ -6,6 +6,7 @@ import 'vuetify/styles'
 import { createVuetify } from 'vuetify'
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+import { ru } from 'vuetify/locale'
 import '@mdi/font/css/materialdesignicons.css'
 
 import App from './App.vue'
@@ -14,6 +15,10 @@ import router from './router'
 const vuetify = createVuetify({
   components,
   directives,
+  locale: {
+    locale: 'ru',
+    messages: { ru },
+  },
 })
 
 const app = createApp(App)

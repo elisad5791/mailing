@@ -1,0 +1,170 @@
+<script setup>
+import { ref, computed, onMounted } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useMailingsStore } from '../stores/mailings.js';
+import { storeToRefs } from 'pinia';
+
+const route = useRoute();
+const router = useRouter();
+const mailingId = route.params.id;
+
+const recurrenceList = [
+  { value: 'daily', title: 'Ежедневно'},
+  { value: 'weekly', title: 'Еженедельно'},
+  { value: 'monthly', title: 'Ежемесячно'},
+];
+const daysOfWeek = [
+  {value: 'mon', label: 'Понедельник'},
+  {value: 'tue', label: 'Вторник'},
+  {value: 'wed', label: 'Среда'},
+  {value: 'thu', label: 'Четверг'},
+  {value: 'fri', label: 'Пятница'},
+  {value: 'sat', label: 'Суббота'},
+  {value: 'sun', label: 'Воскресенье'},
+];
+const daysOfMonth = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
+  '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
+  '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31'
+]
+
+const formRef = ref(null);
+const formError = ref('');
+
+const mailingsStore = useMailingsStore();
+const { currentMailing } = storeToRefs(mailingsStore);
+const { updateMailingSchedule, fetchMailingById } = mailingsStore;
+
+const scheduleType = ref('immediate');
+const scheduleDate = ref(null);
+const scheduleTime = ref(null);
+const recurrenceType = ref('daily');
+const recurrenceDays = ref(['mon']);
+const recurrenceNums = ref([1]);
+
+onMounted(async () => {
+  await fetchMailingById(mailingId);
+  setTimeout(() => {
+    scheduleType.value = currentMailing.value.scheduleType;
+    if (currentMailing.value.scheduleData) {
+      if (currentMailing.value.scheduleData.date) {
+        scheduleDate.value = currentMailing.value.scheduleData.date;
+      }
+      if (currentMailing.value.scheduleData.time) {
+        scheduleTime.value = currentMailing.value.scheduleData.time;
+      }
+      if (currentMailing.value.scheduleData.recurrence) {
+        recurrenceType.value = currentMailing.value.scheduleData.recurrence;
+      }
+      if (currentMailing.value.scheduleData.days) {
+        recurrenceDays.value = currentMailing.value.scheduleData.days;
+      }
+      if (currentMailing.value.scheduleData.nums) {
+        recurrenceNums.value = currentMailing.value.scheduleData.nums;
+      }
+    }
+  }, 0);
+});
+
+const isRecurrence = computed(() => scheduleType.value == 'recurring');
+const isWeekly = computed(() => {
+  const cond1 = scheduleType.value == 'recurring';
+  const cond2 = recurrenceType.value == 'weekly';
+  return cond1 && cond2;
+});
+const isMontly = computed(() => {
+  const cond1 = scheduleType.value == 'recurring';
+  const cond2 = recurrenceType.value == 'monthly';
+  return cond1 && cond2;
+});
+const isDateVisible = computed(() => scheduleType.value == 'scheduled');
+const isTimeVisible = computed(() => scheduleType.value != 'immediate');
+
+async function handleSubmit() {
+  const values = { scheduleType: scheduleType.value, status: 'draft' };
+
+  if (scheduleType.value == 'scheduled') {
+    const data = { date: scheduleDate.value, time: scheduleTime.value };
+    values.scheduleData = data;
+  }
+
+  if (scheduleType.value == 'recurring' && recurrenceType.value == 'daily') {
+    const data = { recurrence: 'daily', time: scheduleTime.value };
+    values.scheduleData = data;
+  }
+
+  if (scheduleType.value == 'recurring' && recurrenceType.value == 'weekly') {
+    const data = { recurrence: 'weekly', days: recurrenceDays.value, time: scheduleTime.value };
+    values.scheduleData = data;
+  }
+
+  if (scheduleType.value == 'recurring' && recurrenceType.value == 'monthly') {
+    const data = { recurrence: 'monthly', nums: recurrenceNums.value, time: scheduleTime.value };
+    values.scheduleData = data;
+  }
+
+  try {
+    await updateMailingSchedule({ id: mailingId, data: values });
+    router.push('/mailings/edit/'+mailingId);
+  } catch (error) {
+    console.error('Ошибка при сохранении графика рассылки:', error);
+  }
+}
+
+function cancel() {
+  router.push('/mailings/edit/'+mailingId);
+}
+</script>
+
+<template>
+<div class="overflow-auto">
+  <h1>Расписание отправки</h1>
+  <div class="my-2">
+    <v-btn size="small" color="primary" variant="tonal" :to="'/mailings/edit/'+mailingId">Назад к редактированию</v-btn>
+  </div>
+
+  <v-form @submit.prevent="handleSubmit" ref="formRef">
+    <v-responsive class="mx-auto px-4 py-4" max-width="700">
+      <div v-if="formError" class="my-2">
+        <v-alert :text="formError" type="error" variant="tonal"></v-alert>
+      </div>
+      
+      <v-radio-group v-model="scheduleType">
+        <v-radio label="Отправить немедленно" value="immediate"></v-radio>
+        <v-radio label="Запланировать" value="scheduled"></v-radio>
+        <v-radio label="Повторяющаяся" value="recurring"></v-radio>
+      </v-radio-group>
+
+      <v-select label="Периодичность" :items="recurrenceList" v-model="recurrenceType" v-if="isRecurrence">
+      </v-select>
+
+      <div class="d-flex justify-space-between">
+        <div v-if="isWeekly">
+          <v-checkbox density="compact" hide-details v-model="recurrenceDays" color="primary"
+            v-for="item in daysOfWeek" :key="item.value" :label="item.label" :value="item.value"></v-checkbox>
+        </div>
+        <div v-if="isMontly">
+          <v-container>
+            <v-row no-gutters>
+              <v-col v-for="item in daysOfMonth" :key="item" cols="4">
+                <v-checkbox density="compact" hide-details v-model="recurrenceNums" color="primary"
+                  :label="item" :value="item"></v-checkbox>
+              </v-col>
+            </v-row>
+          </v-container>
+        </div>
+        <v-date-picker v-model="scheduleDate" v-if="isDateVisible"></v-date-picker>
+        <v-time-picker format="24hr" v-model="scheduleTime" v-if="isTimeVisible"></v-time-picker>
+      </div>
+      
+      <div class="py-4 d-flex justify-space-between">
+        <v-btn type="submit" color="primary">Сохранить</v-btn>
+        <v-btn type="button" class="ml-3" @click="cancel">Отменить</v-btn>
+      </div>
+    </v-responsive>
+  </v-form>
+</div>
+</template>
+
+<style scoped>
+
+</style>
