@@ -1,6 +1,5 @@
 <script setup>
 import { onMounted } from 'vue';
-import { apiClient } from '../api/client.js';
 import { useStatsStore } from '../stores/stats.js';
 import { storeToRefs } from 'pinia';
 import DashboardCard from '../components/DashboardCard.vue';

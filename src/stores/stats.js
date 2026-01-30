@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
-import { apiClient } from '../api/client.js';
+import apolloClient  from '../api/apollo.js';
 import { ref } from 'vue';
+import gql from 'graphql-tag';
 
 export const useStatsStore = defineStore('stats', function () {
   const stats = ref({
@@ -17,15 +18,25 @@ export const useStatsStore = defineStore('stats', function () {
     isLoading.value = true;
     error.value = null;
 
+    const allStatsQuery = gql`
+      query Stats {
+        allStats {
+          id
+          totalMailings
+          mailingsToday
+          deliveredSms
+          deliveredEmails
+          chartData
+        }
+      }
+    `;
+
     try {
-      const response = await apiClient.get('/stats');
-      stats.value = response.data;
-    } catch (err) {
-      error.value = err.response?.data?.message || 'Не удалось загрузить статистику';
-      console.error('Ошибка загрузки статистики: ', err);
+      const { data } = await apolloClient.query({ query: allStatsQuery });
+      stats.value = data.allStats[0];
     } finally {
       isLoading.value = false;
-    }
+    } 
   };
 
   return { stats, isLoading, error, fetchStats };

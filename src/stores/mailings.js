@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
-import { apiClient } from '../api/client.js';
+import apolloClient  from '../api/apollo.js';
 import { ref } from 'vue';
+import gql from 'graphql-tag';
 
 export const useMailingsStore = defineStore('mailings', function () {
   const mailings = ref([]);
@@ -10,14 +11,27 @@ export const useMailingsStore = defineStore('mailings', function () {
 
   async function fetchMailings() {
     loading.value = true;
-    error.value = null;
+
+    const allMailingsQuery = gql`
+      query Mailings {
+        allMailings(sortField: "createdAt", sortOrder: "desc") {
+          id
+          name
+          type
+          status
+          recipients
+          templateId
+          scheduleType
+          scheduleData
+          stats
+          createdAt
+        }
+      }
+    `;
 
     try {
-      const response = await apiClient.get('/mailings?_sort=createdAt&_order=desc');
-      mailings.value = response.data;
-    } catch (err) {
-      console.error('Ошибка при загрузке рассылок:', err);
-      error.value = 'Не удалось загрузить список рассылок';
+      const { data } = await apolloClient.query({ query: allMailingsQuery });
+      mailings.value = data.allMailings;
     } finally {
       loading.value = false;
     }
@@ -26,43 +40,113 @@ export const useMailingsStore = defineStore('mailings', function () {
   async function fetchMailingById(id) {
     loading.value = true;
     currentMailing.value = null;
-    error.value = null;
+
+    const mailingQuery = gql`
+      query Mailing($id: ID!) {
+        Mailing(id: $id) {
+          id
+          name
+          type
+          status
+          recipients
+          templateId
+          scheduleType
+          scheduleData
+          stats
+          createdAt
+        }
+      }
+    `;
 
     try {
-      const response = await apiClient.get(`/mailings/${id}`);
-      currentMailing.value = response.data;
-    } catch (err) {
-      console.error(`Ошибка при загрузке рассылки с ID ${id}:`, err);
-      error.value = 'Не удалось загрузить данные рассылки';
+      const result = await apolloClient.query({
+        query: mailingQuery,
+        variables: { id },
+        fetchPolicy: 'network-only' 
+      });
+      currentMailing.value = result.data.Mailing;
     } finally {
       loading.value = false;
     }
   }
 
   async function deleteMailing(id) {
+    loading.value = true;
+
+    const deleteMailingQuery = gql`
+      mutation DeleteMailing($id: ID!) {
+        deleteMailing(
+          id: $id
+        ) {
+          id
+        }
+      }
+    `;
+    
     try {
-      await apiClient.delete(`/mailings/${id}`)
+      await apolloClient.mutate({ 
+        mutation: deleteMailingQuery, 
+        variables: { id }
+      });
+
       mailings.value = mailings.value.filter(mailing => mailing.id !== id);
       if (currentMailing.value?.id === id) {
         currentMailing.value = null;
       }
-      return true;
-    } catch (error) {
-      console.error(`Ошибка при удалении рассылки с ID ${id}:`, error);
-      error.value = 'Не удалось удалить рассылку';
-      return false;
+    } finally {
+      loading.value = false;
     }
+    return true;
   }
 
   async function createMailing(data) {
     loading.value = true;
     data.recipients = data.recipients.split(',').map(item => item.trim());
     data.createdAt = new Date().toISOString();
+
+    const createMailingQuery = gql`
+      mutation CreateMailing(
+        $name: String!
+        $type: String!
+        $status: String!
+        $recipients: [String!]!
+        $templateId: Int!
+        $scheduleType: String!
+        $stats: JSON
+        $createdAt: Date!
+        $scheduleData: JSON
+      ) {
+        createMailing(
+          name: $name
+          type: $type
+          status: $status
+          recipients: $recipients
+          templateId: $templateId 
+          scheduleType: $scheduleType
+          stats: $stats 
+          createdAt: $createdAt
+          scheduleData: $scheduleData 
+        ) {
+          id
+          name
+          type
+          status
+          recipients
+          templateId
+          scheduleType
+          stats
+          createdAt
+          scheduleData
+        }
+      }
+    `;
+    
     try {
-      await apiClient.post('/mailings', data);
-    } catch (err) {
-      console.error('Ошибка при создании рассылки:', err);
-      error.value = err;
+      const result = await apolloClient.mutate({ 
+        mutation: createMailingQuery, 
+        variables: data,
+      });
+      mailings.value = [...mailings.value, result.data.createMailing];
     } finally {
       loading.value = false;
     }
@@ -71,36 +155,62 @@ export const useMailingsStore = defineStore('mailings', function () {
   async function updateMailing({ id, data }) {
     loading.value = true;
     data.recipients = data.recipients.split(',').map(item => item.trim());
-    try {
-      await apiClient.patch(`/mailings/${id}`, data);
-      if (currentMailing.value?.id === id) {
-        currentMailing.value = { ...currentMailing.value, ...data };
+    data.id = id;
+
+    const updateMailingQuery= gql`
+      mutation UpdateMailing(
+        $id: ID!
+        $name: String!
+        $type: String!
+        $status: String!
+        $recipients: [String!]!
+        $templateId: Int!
+        $scheduleType: String!
+        $stats: JSON
+        $createdAt: Date!
+        $scheduleData: JSON
+      ) {
+        updateMailing(
+          id: $id
+          name: $name
+          type: $type
+          status: $status
+          recipients: $recipients
+          templateId: $templateId 
+          scheduleType: $scheduleType
+          stats: $stats 
+          createdAt: $createdAt
+          scheduleData: $scheduleData 
+        ) {
+          id
+          name
+          type
+          status
+          recipients
+          templateId
+          scheduleType
+          stats
+          createdAt
+          scheduleData
+        }
       }
-    } catch (err) {
-      console.error('Ошибка при обновлении рассылки:', err);
-      error.value = err;
+    `;
+
+    try {
+      const result = await apolloClient.mutate({ 
+        mutation: updateMailingQuery, 
+        variables: data
+      });
+      if (currentMailing.value?.id === id) {
+        currentMailing.value = { ...currentMailing.value, ...result.data.updateMailing };
+      }
     } finally {
       loading.value = false;
     }
   }
 
-  async function updateMailingSchedule({ id, data }) {
-    loading.value = true;
-    try {
-      await apiClient.patch(`/mailings/${id}`, data);
-      if (currentMailing.value?.id === id) {
-        currentMailing.value = { ...currentMailing.value, ...data };
-      }
-    } catch (err) {
-      console.error('Ошибка при обновлении рассылки:', err);
-      error.value = err;
-    } finally {
-      loading.value = false;
-    }
-  }
-
-  return { mailings, currentMailing, loading, error, 
-    fetchMailings, fetchMailingById, deleteMailing, createMailing, 
-    updateMailing, updateMailingSchedule
+  return { 
+    mailings, currentMailing, loading, error, 
+    fetchMailings, fetchMailingById, deleteMailing, createMailing, updateMailing
   };
 });

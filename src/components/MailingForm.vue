@@ -87,9 +87,13 @@ async function handleSubmit() {
   };
   try {
     if (isEditing.value) {
+      values.status = currentMailing.value.status;
+      values.scheduleType = currentMailing.value.scheduleType;
+      values.createdAt = currentMailing.value.createdAt;
       await updateMailing({ id: mailingId.value, data: values });
     } else {
       values.status = 'draft';
+      values.scheduleType = 'immediate';
       await createMailing(values);
     }
     router.push('/mailings');

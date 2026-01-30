@@ -32,7 +32,7 @@ const formError = ref('');
 
 const mailingsStore = useMailingsStore();
 const { currentMailing } = storeToRefs(mailingsStore);
-const { updateMailingSchedule, fetchMailingById } = mailingsStore;
+const { updateMailing, fetchMailingById } = mailingsStore;
 
 const scheduleType = ref('immediate');
 const scheduleDate = ref(null);
@@ -102,8 +102,14 @@ async function handleSubmit() {
     values.scheduleData = data;
   }
 
+  values.name = currentMailing.value.name;
+  values.type = currentMailing.value.type;
+  values.recipients = currentMailing.value.recipients.join(',');
+  values.templateId = currentMailing.value.templateId;
+  values.createdAt = currentMailing.value.createdAt;
+
   try {
-    await updateMailingSchedule({ id: mailingId, data: values });
+    await updateMailing({ id: mailingId, data: values });
     router.push('/mailings/edit/'+mailingId);
   } catch (error) {
     console.error('Ошибка при сохранении графика рассылки:', error);

@@ -1,6 +1,6 @@
 <script setup>
-import { computed, onMounted, ref } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { useMailingsStore } from '../stores/mailings.js';
 import { statusRussian, formatDate } from '../utils/helpers.js';
 import { storeToRefs } from 'pinia';
