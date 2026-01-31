@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import { apiClient } from '../api/client.js';
+import apolloClient  from '../api/apollo.js';
+import gql from 'graphql-tag';
 
 export const useTemplatesStore = defineStore('templates', function() {
   const templates = ref([]);
@@ -18,13 +19,23 @@ export const useTemplatesStore = defineStore('templates', function() {
 
   const fetchTemplates = async () => {
     isLoading.value = true;
-    error.value = null;
+
+    const allTemplatesQuery = gql`
+      query Templates {
+        allTemplates(sortField: "createdAt", sortOrder: "desc") {
+          id
+          name
+          type
+          subject
+          body
+          createdAt
+        }
+      }
+    `;
+
     try {
-      const response = await apiClient.get('/templates');
-      templates.value = response.data;
-    } catch (err) {
-      error.value = err.message || 'Не удалось загрузить шаблоны';
-      console.error('Ошибка при загрузке шаблонов:', err);
+      const { data } = await apolloClient.query({ query: allTemplatesQuery });
+      templates.value = data.allTemplates;
     } finally {
       isLoading.value = false;
     }
@@ -33,42 +44,95 @@ export const useTemplatesStore = defineStore('templates', function() {
   async function fetchTemplateById(id) {
     isLoading.value = true;
     currentTemplate.value = null;
-    error.value = null;
+
+    const templateQuery = gql`
+      query Template($id: ID!) {
+        Template(id: $id) {
+          id
+          name
+          type
+          subject
+          body
+          createdAt
+        }
+      }
+    `;
 
     try {
-      const response = await apiClient.get(`/templates/${id}`);
-      currentTemplate.value = response.data;
-    } catch (err) {
-      console.error(`Ошибка при загрузке шаблона с ID ${id}:`, err);
-      error.value = 'Не удалось загрузить данные шаблона';
+      const result = await apolloClient.query({
+        query: templateQuery,
+        variables: { id },
+        fetchPolicy: 'network-only' 
+      });
+      currentTemplate.value = result.data.Template;
     } finally {
       isLoading.value = false;
     }
   }
 
   async function deleteTemplate(id) {
-    try {
-      await apiClient.delete(`/templates/${id}`)
-      templates.value = templates.value.filter(template => template.id !== id);
-      if (currentTemplate.value?.id === id) {
-        currentTemplate.value = null;
+    isLoading.value = true;
+
+    const deleteTemplateMutation = gql`
+      mutation DeleteTemplate($id: ID!) {
+        deleteTemplate(id: $id) {
+          id
+        }
       }
-      return true;
-    } catch (error) {
-      console.error(`Ошибка при удалении шаблона с ID ${id}:`, error);
-      error.value = 'Не удалось удалить шаблон';
-      return false;
+    `;
+
+    try {
+      await apolloClient.mutate({ 
+        mutation: deleteTemplateMutation, 
+        variables: { id }
+      });
+    } finally {
+      isLoading.value = false;
     }
+
+    templates.value = templates.value.filter(template => template.id !== id);
+    if (currentTemplate.value?.id === id) {
+      currentTemplate.value = null;
+    }
+
+    return true;
   }
 
   async function createTemplate(data) {
     isLoading.value = true;
     data.createdAt = new Date().toISOString();
+
+    const createTemplateMutation = gql`
+      mutation CreateTemplate(
+        $name: String!
+        $type: String!
+        $subject: String!
+        $body: String!
+        $createdAt: Date!
+      ) {
+        createTemplate(
+          name: $name
+          type: $type
+          subject: $subject
+          body: $body
+          createdAt: $createdAt
+        ) {
+          id
+          name
+          type
+          subject
+          body
+          createdAt
+        }
+      }
+    `;
+
     try {
-      await apiClient.post('/templates', data);
-    } catch (err) {
-      console.error('Ошибка при создании шаблона:', err);
-      error.value = err;
+      const result = await apolloClient.mutate({ 
+        mutation: createTemplateMutation, 
+        variables: data,
+      });
+      templates.value = [...templates.value, result.data.createTemplate];
     } finally {
       isLoading.value = false;
     }
@@ -76,14 +140,44 @@ export const useTemplatesStore = defineStore('templates', function() {
 
   async function updateTemplate({ id, data }) {
     isLoading.value = true;
-    try {
-      await apiClient.patch(`/templates/${id}`, data);
-      if (currentTemplate.value?.id === id) {
-        currentTemplate.value = { ...currentTemplate.value, ...data };
+    data.id = id;
+
+    const updateTemplateMutation= gql`
+      mutation UpdateTemplate(
+        $id: ID!
+        $name: String!
+        $type: String!
+        $subject: String!
+        $body: String!
+        $createdAt: Date!
+      ) {
+        updateTemplate(
+          id: $id
+          name: $name
+          type: $type
+          subject: $subject
+          body: $body
+          createdAt: $createdAt
+        ) {
+          id
+          name
+          type
+          subject
+          body
+          createdAt
+        }
       }
-    } catch (err) {
-      console.error('Ошибка при обновлении шаблона:', err);
-      error.value = err;
+    `;
+
+    try {
+      const result = await apolloClient.mutate({ 
+        mutation: updateTemplateMutation, 
+        variables: data
+      });
+
+      if (currentTemplate.value?.id === id) {
+        currentTemplate.value = { ...currentTemplate.value, ...result.data.updateTemplate };
+      }
     } finally {
       isLoading.value = false;
     }

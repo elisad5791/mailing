@@ -73,11 +73,9 @@ export const useMailingsStore = defineStore('mailings', function () {
   async function deleteMailing(id) {
     loading.value = true;
 
-    const deleteMailingQuery = gql`
+    const deleteMailingMutation = gql`
       mutation DeleteMailing($id: ID!) {
-        deleteMailing(
-          id: $id
-        ) {
+        deleteMailing(id: $id) {
           id
         }
       }
@@ -85,7 +83,7 @@ export const useMailingsStore = defineStore('mailings', function () {
     
     try {
       await apolloClient.mutate({ 
-        mutation: deleteMailingQuery, 
+        mutation: deleteMailingMutation, 
         variables: { id }
       });
 
@@ -96,6 +94,7 @@ export const useMailingsStore = defineStore('mailings', function () {
     } finally {
       loading.value = false;
     }
+
     return true;
   }
 
@@ -104,7 +103,7 @@ export const useMailingsStore = defineStore('mailings', function () {
     data.recipients = data.recipients.split(',').map(item => item.trim());
     data.createdAt = new Date().toISOString();
 
-    const createMailingQuery = gql`
+    const createMailingMutation = gql`
       mutation CreateMailing(
         $name: String!
         $type: String!
@@ -143,7 +142,7 @@ export const useMailingsStore = defineStore('mailings', function () {
     
     try {
       const result = await apolloClient.mutate({ 
-        mutation: createMailingQuery, 
+        mutation: createMailingMutation, 
         variables: data,
       });
       mailings.value = [...mailings.value, result.data.createMailing];
@@ -157,7 +156,7 @@ export const useMailingsStore = defineStore('mailings', function () {
     data.recipients = data.recipients.split(',').map(item => item.trim());
     data.id = id;
 
-    const updateMailingQuery= gql`
+    const updateMailingMutation= gql`
       mutation UpdateMailing(
         $id: ID!
         $name: String!
@@ -198,7 +197,7 @@ export const useMailingsStore = defineStore('mailings', function () {
 
     try {
       const result = await apolloClient.mutate({ 
-        mutation: updateMailingQuery, 
+        mutation: updateMailingMutation, 
         variables: data
       });
       if (currentMailing.value?.id === id) {

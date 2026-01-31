@@ -51,6 +51,7 @@ async function handleSubmit() {
 
   try {
     if (isEditing.value) {
+      values.createdAt = currentTemplate.value.createdAt;
       await updateTemplate({ id: templateId.value, data: values });
     } else {
       await createTemplate(values);
