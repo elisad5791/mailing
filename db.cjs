@@ -187,34 +187,33 @@ module.exports = {
   "stats": [
     {
       "id": 1,
-      "totalMailings": 145,
-      "mailingsToday": 5,
-      "deliveredSms": 1280,
-      "deliveredEmails": 5642,
+      "totalMailings": { 
+        "all": 145,
+        "success": 102,
+        "partly": 36,
+        "error": 7
+      },
+      "mailingsToday": {
+        "all": 5,
+        "success": 4,
+        "partly": 1,
+        "error": 1
+      },
+      "deliveredSms": {
+        "all": 1280,
+        "today": 11,
+        "week": 65,
+        "month": 281
+      },
+      "deliveredEmails": {
+        "all": 5642,
+        "today": 32,
+        "week": 154,
+        "month": 587
+      },
       "chartData": {
-        "lastWeek": [
-          15,
-          12,
-          8,
-          10,
-          5,
-          9,
-          11
-        ],
-        "lastMonth": [
-          45,
-          52,
-          48,
-          60,
-          55,
-          58,
-          45,
-          50,
-          48,
-          52,
-          60,
-          55
-        ]
+        "lastWeek": [15, 12, 8, 10, 5, 9, 5],
+        "lastMonth": [45, 52, 48, 60, 55, 58, 45, 50, 48, 52, 60, 55]
       }
     }
   ]

@@ -1,16 +1,9 @@
-<template>
-  <div style="height:300px">
-    <Line :data="chartData" :options="options" />
-  </div>
-</template>
-
 <script setup>
-import { ref, watch, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Line } from 'vue-chartjs';
+import { daysOfWeek, daysOfMonth } from '@/data/calendar';
 import {
   Chart as ChartJS,
-  Title,
-  Tooltip,
   Legend,
   LineElement,
   LinearScale,
@@ -20,8 +13,6 @@ import {
 } from 'chart.js';
 
 ChartJS.register(
-  Title,
-  Tooltip,
   Legend,
   LineElement,
   LinearScale,
@@ -30,7 +21,7 @@ ChartJS.register(
   Filler
 );
 
-const props = defineProps(['data']);
+const props = defineProps(['data', 'type']);
 
 const chartData = ref({
   labels: [],
@@ -48,36 +39,25 @@ const chartData = ref({
 });
 
 const options = ref({
-  responsive: true,
   maintainAspectRatio: false,
-  plugins: {
-    legend: {
-      position: 'top'
-    }
-  },
-  scales: {
-    y: {
-      beginAtZero: true,
-      ticks: {
-        stepSize: 1
-      }
-    }
-  }
+  scales: { y: { beginAtZero: true } },
+  animation: { duration: 2000 } 
 });
 
-watch(() => props.data, (newData) => {
-  if (newData && newData.length > 0) {
-    const labels = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].slice(0, newData.length);
-    chartData.value = {
-      labels: labels,
-      datasets: [
-        {
-          ...chartData.value.datasets[0],
-          data: newData
-        }
-      ]
-    };
-  }
-}, { immediate: true });
+const days = daysOfWeek.map(item => item.label);
 
+onMounted(() => {
+  const len = props.data.length;
+  const labels = props.type == 'week' ? days.slice(0, len) : daysOfMonth.slice(0, len);
+  chartData.value = {
+    labels: labels,
+    datasets: [{ ...chartData.value.datasets[0], data: props.data }]
+  };
+});
 </script>
+
+<template>
+  <div style="height:300px">
+    <Line :data="chartData" :options="options" />
+  </div>
+</template>

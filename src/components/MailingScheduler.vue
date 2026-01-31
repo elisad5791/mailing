@@ -3,29 +3,13 @@ import { ref, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useMailingsStore } from '../stores/mailings.js';
 import { storeToRefs } from 'pinia';
+import { recurrenceList } from '@/data/calendar.js';  
+import { daysOfWeek } from '@/data/calendar.js';  
+import { daysOfMonth } from '@/data/calendar.js';  
 
 const route = useRoute();
 const router = useRouter();
 const mailingId = route.params.id;
-
-const recurrenceList = [
-  { value: 'daily', title: 'Ежедневно'},
-  { value: 'weekly', title: 'Еженедельно'},
-  { value: 'monthly', title: 'Ежемесячно'},
-];
-const daysOfWeek = [
-  {value: 'mon', label: 'Понедельник'},
-  {value: 'tue', label: 'Вторник'},
-  {value: 'wed', label: 'Среда'},
-  {value: 'thu', label: 'Четверг'},
-  {value: 'fri', label: 'Пятница'},
-  {value: 'sat', label: 'Суббота'},
-  {value: 'sun', label: 'Воскресенье'},
-];
-const daysOfMonth = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10',
-  '11', '12', '13', '14', '15', '16', '17', '18', '19', '20',
-  '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31'
-]
 
 const formRef = ref(null);
 const formError = ref('');
