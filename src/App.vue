@@ -46,16 +46,31 @@ function logoutUser() {
 
       <v-main>
         <v-card-text>
-          <RouterView />
+          <router-view v-slot="{ Component }">
+            <transition name="routing" mode="out-in">
+              <component :is="Component" />
+            </transition>
+          </router-view>
         </v-card-text>
       </v-main>
     </v-layout>
 </template>
 
-<style scoped>
+<style>
 .link_clear {
   color: inherit;
   text-decoration: none;
   margin-right: 20px;
+}
+
+.routing-enter-active,
+.routing-leave-active {
+  transition: all 0.5s ease-out;
+}
+
+.routing-enter-from,
+.routing-leave-to {
+  transform: scale(0.4);
+  opacity: 0;
 }
 </style>

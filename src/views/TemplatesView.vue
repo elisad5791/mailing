@@ -23,8 +23,6 @@ async function handleDelete(id) {
 </script>
 
 <template>
-  <RouterView />
-
    <div class="overflow-auto">
     <div>
       <h1>Управление шаблонами</h1>

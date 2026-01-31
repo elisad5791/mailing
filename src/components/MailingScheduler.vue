@@ -66,6 +66,11 @@ onMounted(async () => {
 });
 
 const isRecurrence = computed(() => scheduleType.value == 'recurring');
+const isDaily = computed(() => {
+  const cond1 = scheduleType.value == 'recurring';
+  const cond2 = recurrenceType.value == 'daily';
+  return cond1 && cond2;
+});
 const isWeekly = computed(() => {
   const cond1 = scheduleType.value == 'recurring';
   const cond2 = recurrenceType.value == 'weekly';
@@ -76,8 +81,7 @@ const isMontly = computed(() => {
   const cond2 = recurrenceType.value == 'monthly';
   return cond1 && cond2;
 });
-const isDateVisible = computed(() => scheduleType.value == 'scheduled');
-const isTimeVisible = computed(() => scheduleType.value != 'immediate');
+const isScheduled = computed(() => scheduleType.value == 'scheduled');
 
 async function handleSubmit() {
   const values = { scheduleType: scheduleType.value, status: 'draft' };
@@ -140,27 +144,36 @@ function cancel() {
         <v-radio label="Повторяющаяся" value="recurring"></v-radio>
       </v-radio-group>
 
+      <transition name="scheduling" mode="out-in">
+          <div v-if="isScheduled" class="d-flex justify-space-between">
+            <v-date-picker v-model="scheduleDate"></v-date-picker>
+            <v-time-picker format="24hr" v-model="scheduleTime"></v-time-picker>
+          </div>
+          <div v-else-if="isDaily">
+            <v-time-picker format="24hr" v-model="scheduleTime"></v-time-picker>
+          </div>
+          <div v-else-if="isWeekly" class="d-flex justify-space-between">
+            <div>
+              <v-checkbox density="compact" hide-details v-model="recurrenceDays" color="primary"
+                v-for="item in daysOfWeek" :key="item.value" :label="item.label" :value="item.value"></v-checkbox>
+            </div>
+            <v-time-picker format="24hr" v-model="scheduleTime"></v-time-picker>
+          </div>
+          <div v-else-if="isMontly" class="d-flex justify-space-between">
+            <v-container>
+              <v-row no-gutters>
+                <v-col v-for="item in daysOfMonth" :key="item" cols="4">
+                  <v-checkbox density="compact" hide-details v-model="recurrenceNums" color="primary"
+                    :label="item" :value="item"></v-checkbox>
+                </v-col>
+              </v-row>
+            </v-container>
+            <v-time-picker format="24hr" v-model="scheduleTime"></v-time-picker>
+          </div>
+      </transition>
+
       <v-select label="Периодичность" :items="recurrenceList" v-model="recurrenceType" v-if="isRecurrence">
       </v-select>
-
-      <div class="d-flex justify-space-between">
-        <div v-if="isWeekly">
-          <v-checkbox density="compact" hide-details v-model="recurrenceDays" color="primary"
-            v-for="item in daysOfWeek" :key="item.value" :label="item.label" :value="item.value"></v-checkbox>
-        </div>
-        <div v-if="isMontly">
-          <v-container>
-            <v-row no-gutters>
-              <v-col v-for="item in daysOfMonth" :key="item" cols="4">
-                <v-checkbox density="compact" hide-details v-model="recurrenceNums" color="primary"
-                  :label="item" :value="item"></v-checkbox>
-              </v-col>
-            </v-row>
-          </v-container>
-        </div>
-        <v-date-picker v-model="scheduleDate" v-if="isDateVisible"></v-date-picker>
-        <v-time-picker format="24hr" v-model="scheduleTime" v-if="isTimeVisible"></v-time-picker>
-      </div>
       
       <div class="py-4 d-flex justify-space-between">
         <v-btn type="submit" color="primary">Сохранить</v-btn>
@@ -172,5 +185,17 @@ function cancel() {
 </template>
 
 <style scoped>
+  .scheduling-enter-active {
+    transition: all 0.8s ease-out;
+  }
 
+  .scheduling-leave-active {
+    transition: all 0.4s cubic-bezier(1, 0.5, 0.8, 1);
+  }
+
+  .scheduling-enter-from,
+  .scheduling-leave-to {
+    transform: translateX(30%);
+    opacity: 0;
+  }
 </style>

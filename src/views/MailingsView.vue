@@ -39,8 +39,6 @@ function handleAction(id) {
 </script>
 
 <template>
-  <RouterView />
-
    <div>
     <div>
       <h1>Управление рассылками</h1>
