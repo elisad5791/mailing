@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import apolloClient  from '../api/apollo.js';
+import { apolloClient }  from '../api/apollo.js';
 import { ref } from 'vue';
 import gql from 'graphql-tag';
 

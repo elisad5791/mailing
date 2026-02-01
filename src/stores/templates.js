@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
-import apolloClient  from '../api/apollo.js';
+import { apolloClient }  from '../api/apollo.js';
 import gql from 'graphql-tag';
 
 export const useTemplatesStore = defineStore('templates', function() {

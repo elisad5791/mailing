@@ -16,7 +16,7 @@ const routes = [
     path: '/',
     name: 'dashboard',
     component: DashboardView,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: true }
   },
   {
     path: '/login',
@@ -33,7 +33,7 @@ const routes = [
       { path: 'edit/:id', component: MailingForm },
       { path: 'schedule/:id', component: MailingScheduler },
     ],
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: true }
   },
   {
     path: '/templates',
@@ -43,13 +43,13 @@ const routes = [
       { path: ':id', component: TemplateShow },
       { path: 'edit/:id', component: TemplateForm }
     ],
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: true }
   },
   {
     path: '/settings',
     name: 'settings',
     component: SettingsView,
-    meta: { requiresAuth: false }
+    meta: { requiresAuth: true }
   },
 ];
 

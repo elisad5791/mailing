@@ -27,17 +27,13 @@ export const useAuthStore = defineStore('auth', function () {
   }
 
   async function login(credentials) {
-    try {
-      const response = await apiClient.post('/login', credentials);
-      
-      const { token: newToken, user: userData } = response.data;
-      setToken(newToken);
-      setUser(userData);
-      
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await apiClient.post('/login', credentials);
+    
+    const { token: newToken, user: userData } = response.data;
+    setToken(newToken);
+    setUser(userData);
+    
+    return response;
   };
 
   function logout() {
@@ -46,10 +42,7 @@ export const useAuthStore = defineStore('auth', function () {
   }
 
   function checkAuth() {
-    if (token.value) {
-      return true;
-    }
-    return false;
+    return !!token.value;
   };
 
   return { user, token, isAuthenticated, setToken, setUser, login, logout, checkAuth };

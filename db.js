@@ -1,9 +1,9 @@
-{
+export const data = {
   "users": [
     {
       "id": 1,
       "email": "admin@mail.com",
-      "password": "$2a$10$KssILxWNR6k62B7yiX0GAe2Q7wwHlrzhF3LqtVvpyvHZf0MwvNfVu"
+      "password": "admin123"
     }
   ],
   "mailings": [
@@ -184,35 +184,37 @@
       "id": 3
     }
   ],
-  "stats": {
-    "totalMailings": 145,
-    "mailingsToday": 5,
-    "deliveredSms": 1280,
-    "deliveredEmails": 5642,
-    "chartData": {
-      "lastWeek": [
-        15,
-        12,
-        8,
-        10,
-        5,
-        9,
-        11
-      ],
-      "lastMonth": [
-        45,
-        52,
-        48,
-        60,
-        55,
-        58,
-        45,
-        50,
-        48,
-        52,
-        60,
-        55
-      ]
+  "stats": [
+    {
+      "id": 1,
+      "totalMailings": { 
+        "all": 145,
+        "success": 102,
+        "partly": 36,
+        "error": 7
+      },
+      "mailingsToday": {
+        "all": 5,
+        "success": 4,
+        "partly": 1,
+        "error": 1
+      },
+      "deliveredSms": {
+        "all": 1280,
+        "today": 11,
+        "week": 65,
+        "month": 281
+      },
+      "deliveredEmails": {
+        "all": 5642,
+        "today": 32,
+        "week": 154,
+        "month": 587
+      },
+      "chartData": {
+        "lastWeek": [15, 12, 8, 10, 5, 9, 5],
+        "lastMonth": [45, 52, 48, 60, 55, 58, 45, 50, 48, 52, 60, 55]
+      }
     }
-  }
+  ]
 }
