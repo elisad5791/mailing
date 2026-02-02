@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watchEffect } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import { RouterView, RouterLink, useRouter } from 'vue-router';
 import { useAuthStore } from './stores/auth.js';
 
@@ -9,11 +9,23 @@ const router = useRouter();
 const drawer = ref(false);
 const { logout } = authStore;
 
+let socket;
+
+onMounted(() => {
+  socket = new WebSocket('ws://localhost:8080');
+});
+
+onUnmounted(() => {
+  if(socket) {
+    socket.close()
+    socket = null
+  }
+});
+
 function logoutUser() {
   logout();
   router.push('/login');
 }
-
 </script>
 
 <template>

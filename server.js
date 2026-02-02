@@ -6,12 +6,16 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import bodyParser from 'body-parser'; 
 import { authMiddleware } from './auth-middleware.js';
+import { WebSocketServer } from 'ws';
+import { createServer } from 'http';
 
 dotenv.config();
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
 
-const PORT = 8080;
 const app = express();
+const server = createServer(app);
+const wss = new WebSocketServer({ server });
+
 app.use(cors());
 app.use(bodyParser.json());
 app.use(authMiddleware());
@@ -36,6 +40,20 @@ app.post('/login', (req, res) => {
 
 app.use('/graphql', jsonGraphqlExpress(data));
 
-app.listen(PORT, () => {
-  console.log(`JSON-GRAPHQL Server is running on port ${PORT}`);
+wss.on("connection", (ws) => {
+  console.log("Client connected");
+
+  ws.on("close", () => {
+    console.log("Client disconnected");
+  });
+
+  ws.on("error", (error) => {
+    console.error("WebSocket error:", error);
+  });
+});
+
+const PORT = 8080;
+server.listen(PORT, () => {
+  console.log(`Server on http://localhost:${PORT}`);
+  console.log(`WebSocket server on ws://localhost:${PORT}`);
 });
