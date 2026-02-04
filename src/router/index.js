@@ -3,7 +3,6 @@ import DashboardView from '../views/DashboardView.vue';
 import LoginView from '../views/LoginView.vue';
 import MailingsView from '../views/MailingsView.vue';
 import TemplatesView from '../views/TemplatesView.vue';
-import SettingsView from '../views/SettingsView.vue';
 import MailingForm from '../components/MailingForm.vue';
 import MailingScheduler from '../components/MailingScheduler.vue';
 import TemplateForm from '../components/TemplateForm.vue';
@@ -43,12 +42,6 @@ const routes = [
       { path: ':id', component: TemplateShow },
       { path: 'edit/:id', component: TemplateForm }
     ],
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/settings',
-    name: 'settings',
-    component: SettingsView,
     meta: { requiresAuth: true }
   },
 ];

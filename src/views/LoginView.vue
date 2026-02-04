@@ -57,20 +57,22 @@ const passwordRules = ref([
 </script>
 
 <template>
-  <h1>Вход в кабинет</h1>
+  <div>
+    <h1>Вход в кабинет</h1>
 
-  <v-sheet class="mx-auto" width="300">
-    <v-form @submit.prevent="handleSubmit" ref="formRef">
-      <div v-if="formError" class="my-2">
-        <v-alert :text="formError" type="error" variant="tonal"></v-alert>
-      </div>
-      <v-text-field v-model="form.email" :rules="emailRules" label="Email" :disabled="isLoading"></v-text-field>
-      <v-text-field v-model="form.password" :rules="passwordRules" label="Пароль" type="password" class="mt-2" :disabled="isLoading">
-      </v-text-field>
-      <v-btn class="mt-2" type="submit" block :disabled="isLoading">
-        <span v-if="isLoading">Вход...</span>
-        <span v-else>Войти</span>
-      </v-btn>
-    </v-form>
-  </v-sheet>
+    <v-sheet class="mx-auto" width="300">
+      <v-form @submit.prevent="handleSubmit" ref="formRef">
+        <div v-if="formError" class="my-2">
+          <v-alert :text="formError" type="error" variant="tonal"></v-alert>
+        </div>
+        <v-text-field v-model="form.email" :rules="emailRules" label="Email" :disabled="isLoading"></v-text-field>
+        <v-text-field v-model="form.password" :rules="passwordRules" label="Пароль" type="password" class="mt-2" :disabled="isLoading">
+        </v-text-field>
+        <v-btn class="mt-2" type="submit" block :disabled="isLoading">
+          <span v-if="isLoading">Вход...</span>
+          <span v-else>Войти</span>
+        </v-btn>
+      </v-form>
+    </v-sheet>
+  </div>
 </template>

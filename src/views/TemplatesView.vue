@@ -23,7 +23,7 @@ async function handleDelete(id) {
 </script>
 
 <template>
-   <div class="overflow-auto">
+  <div class="overflow-auto">
     <div>
       <h1>Управление шаблонами</h1>
       <v-btn to="/templates/create" color="primary" class="my-2">Создать</v-btn>

@@ -84,7 +84,6 @@ async function handleSms(count) {
           <v-list-item><RouterLink :to="{ name: 'dashboard' }" class="link_clear">Главная</RouterLink></v-list-item>
           <v-list-item><RouterLink :to="{ name: 'mailings' }" class="link_clear">Рассылки</RouterLink></v-list-item>
           <v-list-item><RouterLink :to="{ name: 'templates' }" class="link_clear">Шаблоны</RouterLink></v-list-item>
-          <v-list-item><RouterLink :to="{ name: 'settings' }" class="link_clear">Настройки</RouterLink></v-list-item>
         </v-list>
       </v-navigation-drawer>
 
