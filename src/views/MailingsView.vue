@@ -6,12 +6,14 @@ import { formatDate } from '../utils/helpers.js';
 import { statuses } from '../data/statuses';
 import { scheduleTypes } from '../data/types';
 
+const emit = defineEmits(['sms', 'email']);
+
 const deleting = ref(false);
 const isExecuting = ref(false);
 
 const mailingsStore = useMailingsStore();
 const { mailings, loading, error } = storeToRefs(mailingsStore);
-const { fetchMailings, deleteMailing } = mailingsStore;
+const { fetchMailings, deleteMailing, updateMailing } = mailingsStore;
 
 onMounted(async function() {
   await fetchMailings();
@@ -29,11 +31,28 @@ function handleAction(id) {
   const timeout = statuses[mailing['status']]['action_time'] * 1000;
 
   isExecuting.value = true;
-  setTimeout(() => { 
+  setTimeout(async () => { 
     isExecuting.value = false; 
     const scheduleType = mailing['scheduleType'];
     const newStatus = statuses[mailing['status']]['status_after_action'][scheduleType];
-    mailing['status'] = newStatus;
+    const data = {
+      name: mailing.name,
+      type: mailing.type,
+      status: newStatus,
+      recipients: mailing.recipients.join(','),
+      templateId: mailing.templateId,
+      scheduleType: mailing.scheduleType,
+      createdAt: mailing.createdAt
+    };
+
+    await updateMailing({ id, data });
+
+    if (mailing.type == 'sms') {
+      emit('sms', mailing.recipients.length);
+    }
+    if (mailing.type == 'email') {
+      emit('email', mailing.recipients.length);
+    }
   }, timeout); 
 }
 </script>
@@ -59,54 +78,56 @@ function handleAction(id) {
       Рассылок пока нет.
     </div>
 
-    <v-table style="min-width:1200px" v-else>
-      <thead>
-        <tr>
-          <th class="text-left font-weight-bold">Название</th>
-          <th class="text-left font-weight-bold">Тип</th>
-          <th class="text-left font-weight-bold">Статус</th>
-          <th class="text-left font-weight-bold">Получатели</th>
-          <th class="text-left font-weight-bold">Дата создания</th>
-          <th class="text-left font-weight-bold">Действия</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="mailing in mailings" :key="mailing.id">
-          <td>{{ mailing.name }}</td>
-          <td>
-            <span>
-              <v-icon icon="mdi-message-processing" v-if="mailing.type == 'sms'"/>
-              <v-icon icon="mdi-email" v-else />
-              {{ mailing.type.toUpperCase() }}
-              <v-icon icon="mdi-arrow-up-bold-outline" v-if="mailing.scheduleType == 'immediate'"/>
-              <v-icon icon="mdi-clock-outline" v-else-if="mailing.scheduleType == 'scheduled'"/>
-              <v-icon icon="mdi-autorenew" v-else />
-              {{ scheduleTypes[mailing.scheduleType].translation }}
-            </span>
-          </td>
-          <td>
-            <span>
-              <v-icon :icon="statuses[mailing.status]['icon']" />
-              {{ statuses[mailing.status]['translation'] }}
-            </span>
-          </td>
-          <td>{{ mailing.recipients.length }}</td>
-          <td>{{ formatDate(mailing.createdAt) }}</td>
-          <td class="actions">
-            <v-btn size="small" color="primary" variant="tonal" :to="'/mailings/'+mailing.id">Просмотр</v-btn>
-            <v-btn size="small" color="success" variant="tonal" :to="'/mailings/edit/'+mailing.id" class="ms-2">
-              Редактировать
-            </v-btn>
-            <v-btn size="small" color="error" variant="tonal" @click="handleDelete(mailing.id)" class="ms-2">
-              Удалить
-            </v-btn>
-            <v-btn size="small" color="warning" variant="tonal" @click="handleAction(mailing.id)" class="ms-2">
-              {{ statuses[mailing.status]['action'] }}
-            </v-btn>
-          </td>
-        </tr>
-      </tbody>
-    </v-table>
+    <div class="overflow-x-auto" v-else>
+      <v-table style="min-width:1400px" >
+        <thead>
+          <tr>
+            <th class="text-left font-weight-bold">Название</th>
+            <th class="text-left font-weight-bold">Тип</th>
+            <th class="text-left font-weight-bold">Статус</th>
+            <th class="text-left font-weight-bold">Получатели</th>
+            <th class="text-left font-weight-bold">Дата создания</th>
+            <th class="text-left font-weight-bold">Действия</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="mailing in mailings" :key="mailing.id">
+            <td>{{ mailing.name }}</td>
+            <td>
+              <span>
+                <v-icon icon="mdi-message-processing" v-if="mailing.type == 'sms'"/>
+                <v-icon icon="mdi-email" v-else />
+                {{ mailing.type.toUpperCase() }}
+                <v-icon icon="mdi-arrow-up-bold-outline" v-if="mailing.scheduleType == 'immediate'"/>
+                <v-icon icon="mdi-clock-outline" v-else-if="mailing.scheduleType == 'scheduled'"/>
+                <v-icon icon="mdi-autorenew" v-else />
+                {{ scheduleTypes[mailing.scheduleType].translation }}
+              </span>
+            </td>
+            <td>
+              <span>
+                <v-icon :icon="statuses[mailing.status]['icon']" />
+                {{ statuses[mailing.status]['translation'] }}
+              </span>
+            </td>
+            <td>{{ mailing.recipients.length }}</td>
+            <td>{{ formatDate(mailing.createdAt) }}</td>
+            <td class="actions">
+              <v-btn size="small" color="primary" variant="tonal" :to="'/mailings/'+mailing.id">Просмотр</v-btn>
+              <v-btn size="small" color="success" variant="tonal" :to="'/mailings/edit/'+mailing.id" class="ms-2">
+                Редактировать
+              </v-btn>
+              <v-btn size="small" color="error" variant="tonal" @click="handleDelete(mailing.id)" class="ms-2">
+                Удалить
+              </v-btn>
+              <v-btn size="small" color="warning" variant="tonal" @click="handleAction(mailing.id)" class="ms-2">
+                {{ statuses[mailing.status]['action'] }}
+              </v-btn>
+            </td>
+          </tr>
+        </tbody>
+      </v-table>
+    </div>
 
     <div class="text-center mt-5" v-if="isExecuting">
       <v-progress-circular

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useStatsStore } from '../stores/stats.js';
 import { storeToRefs } from 'pinia';
 import DashboardCard from '../components/DashboardCard.vue';
@@ -12,11 +12,6 @@ const expandDeliveredEmails = ref(false);
 
 const statsStore = useStatsStore();
 const { stats, isLoading, error } = storeToRefs(statsStore);
-const { fetchStats } = statsStore;
-
-onMounted(async function () {
-  fetchStats();
-});
 
 function handleShowAllMailings() {
   expandAllMailings.value = !expandAllMailings.value;
@@ -149,12 +144,12 @@ function handleShowDeliveredEmails() {
       </v-row>
 
       <v-row class="mt-8">
-        <v-col cols="6">
+        <v-col cols="12" md="6">
           <h2 class="text-h6">Активность рассылок за текущую неделю</h2>
           <Chart :data="stats.chartData.lastWeek" type="week" />
         </v-col>
 
-        <v-col cols="6">
+        <v-col cols="12" md="6">
           <h2 class="text-h6">Активность рассылок за текущий месяц</h2>
           <Chart :data="stats.chartData.lastMonth" type="month" />
         </v-col>

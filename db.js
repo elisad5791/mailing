@@ -2,8 +2,13 @@ export const data = {
   "users": [
     {
       "id": 1,
-      "email": "admin@mail.com",
-      "password": "admin123"
+      "email": "admin1@mail.ru",
+      "password": "admin111"
+    },
+    {
+      "id": 2,
+      "email": "admin2@mail.ru",
+      "password": "admin222"
     }
   ],
   "mailings": [
@@ -195,7 +200,7 @@ export const data = {
       },
       "mailingsToday": {
         "all": 5,
-        "success": 4,
+        "success": 3,
         "partly": 1,
         "error": 1
       },

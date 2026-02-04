@@ -2,5 +2,8 @@
 
 ### вход
 
-admin@mail.com  
-admin123
+admin1@mail.ru
+admin111
+
+admin2@mail.ru
+admin222

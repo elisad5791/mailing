@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue';
 import { RouterView, RouterLink, useRouter } from 'vue-router';
 import { useAuthStore } from './stores/auth.js';
+import { useStatsStore } from './stores/stats.js';
 
 const authStore = useAuthStore();
 const router = useRouter();
@@ -9,10 +10,25 @@ const router = useRouter();
 const drawer = ref(false);
 const { logout } = authStore;
 
+const statStore = useStatsStore();
+const { fetchStats, updateStat } = statStore;
+
 let socket;
 
-onMounted(() => {
+onMounted(async () => {
+  await fetchStats();
+
   socket = new WebSocket('ws://localhost:8080');
+
+  socket.addEventListener('message', async ({ data }) => {
+    if (data == 'stat') {
+      await fetchStats();
+    }
+  });
+
+  socket.addEventListener('error', (err) => {
+    console.error('Ws error', err);
+  });
 });
 
 onUnmounted(() => {
@@ -25,6 +41,22 @@ onUnmounted(() => {
 function logoutUser() {
   logout();
   router.push('/login');
+}
+
+async function handleEmail(count) {
+  await updateStat('email', count);
+
+  if(socket.readyState === WebSocket.OPEN) {
+    socket.send('stat');
+  }
+}
+
+async function handleSms(count) {
+  await updateStat('sms', count);
+
+  if(socket.readyState === WebSocket.OPEN) {
+    socket.send('stat');
+  }
 }
 </script>
 
@@ -60,7 +92,7 @@ function logoutUser() {
         <v-card-text>
           <router-view v-slot="{ Component }">
             <transition name="routing" mode="out-in">
-              <component :is="Component" />
+              <component :is="Component" @email="handleEmail" @sms="handleSms" />
             </transition>
           </router-view>
         </v-card-text>

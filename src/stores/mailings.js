@@ -30,7 +30,10 @@ export const useMailingsStore = defineStore('mailings', function () {
     `;
 
     try {
-      const { data } = await apolloClient.query({ query: allMailingsQuery });
+      const { data } = await apolloClient.query({ 
+        query: allMailingsQuery,
+        fetchPolicy: 'network-only'  
+      });
       mailings.value = data.allMailings;
     } finally {
       loading.value = false;
@@ -196,13 +199,16 @@ export const useMailingsStore = defineStore('mailings', function () {
     `;
 
     try {
-      const result = await apolloClient.mutate({ 
+      await apolloClient.mutate({ 
         mutation: updateMailingMutation, 
         variables: data
       });
+
       if (currentMailing.value?.id === id) {
-        currentMailing.value = { ...currentMailing.value, ...result.data.updateMailing };
+        await fetchMailingById(id);
       }
+      
+      await fetchMailings();
     } finally {
       loading.value = false;
     }
