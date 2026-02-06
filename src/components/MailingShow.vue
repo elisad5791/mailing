@@ -2,8 +2,10 @@
 import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMailingsStore } from '../stores/mailings.js';
-import { statusRussian, formatDate } from '../utils/helpers.js';
+import { formatDate } from '../utils/helpers.js';
 import { storeToRefs } from 'pinia';
+import { statuses } from '@/data/statuses.js';
+import { scheduleTypes } from '@/data/types.js';
 
 const route = useRoute();
 
@@ -46,14 +48,17 @@ onMounted(async function() {
                 {{ currentMailing.type.toUpperCase() }}
               </p>
               <p class="ms-2">
-                <v-icon icon="mdi-check" v-if="currentMailing.status == 'completed'" />
-                <v-icon icon="mdi-clock-edit-outline" v-else />
-                {{ statusRussian(currentMailing.status) }}
+                <v-icon :icon="statuses[currentMailing.status]['icon']" />
+                {{ statuses[currentMailing.status]['translation'] }}
+              </p>
+              <p class="ms-2">
+                <v-icon :icon="scheduleTypes[currentMailing.scheduleType]['icon']" />
+                {{ scheduleTypes[currentMailing.scheduleType]['translation'] }}
               </p>
             </div>
 
             <div class="mt-2">
-              Шаблон: {{ currentMailing.templateId }}
+              Шаблон: {{ currentMailing.Template.name }}
             </div>
 
             <p class="my-2">Создана: {{ formatDate(currentMailing.createdAt) }}</p>

@@ -22,7 +22,7 @@ export const useTemplatesStore = defineStore('templates', function() {
 
     const allTemplatesQuery = gql`
       query Templates {
-        allTemplates(sortField: "createdAt", sortOrder: "desc") {
+        allTemplates {
           id
           name
           type
@@ -34,8 +34,14 @@ export const useTemplatesStore = defineStore('templates', function() {
     `;
 
     try {
-      const { data } = await apolloClient.query({ query: allTemplatesQuery });
-      templates.value = data.allTemplates;
+      const { data } = await apolloClient.query({ 
+        query: allTemplatesQuery,
+        fetchPolicy: 'network-only'
+      });
+
+      templates.value = [...data.allTemplates].sort((a, b) => {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
     } finally {
       isLoading.value = false;
     }
@@ -106,7 +112,7 @@ export const useTemplatesStore = defineStore('templates', function() {
       mutation CreateTemplate(
         $name: String!
         $type: String!
-        $subject: String!
+        $subject: String
         $body: String!
         $createdAt: Date!
       ) {
@@ -128,11 +134,12 @@ export const useTemplatesStore = defineStore('templates', function() {
     `;
 
     try {
-      const result = await apolloClient.mutate({ 
+      await apolloClient.mutate({ 
         mutation: createTemplateMutation, 
         variables: data,
       });
-      templates.value = [...templates.value, result.data.createTemplate];
+      
+      await fetchTemplates();
     } finally {
       isLoading.value = false;
     }
@@ -147,7 +154,7 @@ export const useTemplatesStore = defineStore('templates', function() {
         $id: ID!
         $name: String!
         $type: String!
-        $subject: String!
+        $subject: String
         $body: String!
         $createdAt: Date!
       ) {

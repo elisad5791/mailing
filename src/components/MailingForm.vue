@@ -66,7 +66,7 @@ onMounted(async () => {
     setTimeout(() => {
       name.value = currentMailing.value.name;
       type.value = currentMailing.value.type;
-      template.value = currentMailing.value.templateId;
+      template.value = currentMailing.value.Template.id;
       recipients.value = currentMailing.value.recipients.join(',');
     }, 0);
   }
@@ -82,7 +82,7 @@ async function handleSubmit() {
   const values = {
     name: name.value,
     type: type.value,
-    templateId: template.value,
+    template_id: template.value,
     recipients: recipients.value
   };
   try {

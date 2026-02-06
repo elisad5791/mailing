@@ -14,13 +14,13 @@ export const useMailingsStore = defineStore('mailings', function () {
 
     const allMailingsQuery = gql`
       query Mailings {
-        allMailings(sortField: "createdAt", sortOrder: "desc") {
+        allMailings {
           id
           name
           type
           status
           recipients
-          templateId
+          template_id
           scheduleType
           scheduleData
           stats
@@ -34,7 +34,10 @@ export const useMailingsStore = defineStore('mailings', function () {
         query: allMailingsQuery,
         fetchPolicy: 'network-only'  
       });
-      mailings.value = data.allMailings;
+
+      mailings.value = [...data.allMailings].sort((a, b) => {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      });
     } finally {
       loading.value = false;
     }
@@ -52,7 +55,10 @@ export const useMailingsStore = defineStore('mailings', function () {
           type
           status
           recipients
-          templateId
+          Template {
+            id
+            name
+          }
           scheduleType
           scheduleData
           stats
@@ -112,7 +118,7 @@ export const useMailingsStore = defineStore('mailings', function () {
         $type: String!
         $status: String!
         $recipients: [String!]!
-        $templateId: Int!
+        $template_id: ID!
         $scheduleType: String!
         $stats: JSON
         $createdAt: Date!
@@ -123,7 +129,7 @@ export const useMailingsStore = defineStore('mailings', function () {
           type: $type
           status: $status
           recipients: $recipients
-          templateId: $templateId 
+          template_id: $template_id 
           scheduleType: $scheduleType
           stats: $stats 
           createdAt: $createdAt
@@ -134,7 +140,7 @@ export const useMailingsStore = defineStore('mailings', function () {
           type
           status
           recipients
-          templateId
+          template_id
           scheduleType
           stats
           createdAt
@@ -144,11 +150,12 @@ export const useMailingsStore = defineStore('mailings', function () {
     `;
     
     try {
-      const result = await apolloClient.mutate({ 
+      await apolloClient.mutate({ 
         mutation: createMailingMutation, 
         variables: data,
       });
-      mailings.value = [...mailings.value, result.data.createMailing];
+      
+      await fetchMailings();
     } finally {
       loading.value = false;
     }
@@ -166,7 +173,7 @@ export const useMailingsStore = defineStore('mailings', function () {
         $type: String!
         $status: String!
         $recipients: [String!]!
-        $templateId: Int!
+        $template_id: ID!
         $scheduleType: String!
         $stats: JSON
         $createdAt: Date!
@@ -178,7 +185,7 @@ export const useMailingsStore = defineStore('mailings', function () {
           type: $type
           status: $status
           recipients: $recipients
-          templateId: $templateId 
+          template_id: $template_id 
           scheduleType: $scheduleType
           stats: $stats 
           createdAt: $createdAt
@@ -189,7 +196,7 @@ export const useMailingsStore = defineStore('mailings', function () {
           type
           status
           recipients
-          templateId
+          template_id
           scheduleType
           stats
           createdAt

@@ -40,17 +40,17 @@ function handleAction(id) {
       type: mailing.type,
       status: newStatus,
       recipients: mailing.recipients.join(','),
-      templateId: mailing.templateId,
+      template_id: mailing.template_id,
       scheduleType: mailing.scheduleType,
       createdAt: mailing.createdAt
     };
 
     await updateMailing({ id, data });
 
-    if (mailing.type == 'sms') {
+    if (mailing.type == 'sms' && mailing.scheduleType == 'immediate') {
       emit('sms', mailing.recipients.length);
     }
-    if (mailing.type == 'email') {
+    if (mailing.type == 'email' && mailing.scheduleType == 'immediate') {
       emit('email', mailing.recipients.length);
     }
   }, timeout); 
@@ -98,9 +98,7 @@ function handleAction(id) {
                 <v-icon icon="mdi-message-processing" v-if="mailing.type == 'sms'"/>
                 <v-icon icon="mdi-email" v-else />
                 {{ mailing.type.toUpperCase() }}
-                <v-icon icon="mdi-arrow-up-bold-outline" v-if="mailing.scheduleType == 'immediate'"/>
-                <v-icon icon="mdi-clock-outline" v-else-if="mailing.scheduleType == 'scheduled'"/>
-                <v-icon icon="mdi-autorenew" v-else />
+                <v-icon :icon="scheduleTypes[mailing.scheduleType].icon" />
                 {{ scheduleTypes[mailing.scheduleType].translation }}
               </span>
             </td>
@@ -129,7 +127,7 @@ function handleAction(id) {
       </v-table>
     </div>
 
-    <div class="text-center mt-5" v-if="isExecuting">
+    <div class="text-center my-10" v-if="isExecuting">
       <v-progress-circular
         :size="70"
         :width="7"

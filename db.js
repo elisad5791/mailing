@@ -21,7 +21,7 @@ export const data = {
         "+79001112233",
         "+79004445566"
       ],
-      "templateId": 1,
+      "template_id": 2,
       "scheduleType": "recurring",
       "stats": {
         "total": 2,
@@ -48,7 +48,7 @@ export const data = {
         "+79001112233",
         "+79004445566"
       ],
-      "templateId": 1,
+      "template_id": 2,
       "scheduleType": "recurring",
       "stats": {
         "total": 2,
@@ -75,7 +75,7 @@ export const data = {
         "+79001112233",
         "+79004445566"
       ],
-      "templateId": 1,
+      "template_id": 2,
       "scheduleType": "recurring",
       "stats": {
         "total": 2,
@@ -97,7 +97,7 @@ export const data = {
         "+79001112233",
         "+79004445566"
       ],
-      "templateId": 1,
+      "template_id": 2,
       "scheduleType": "scheduled",
       "stats": {
         "total": 2,
@@ -119,7 +119,7 @@ export const data = {
         "user1@mail.com",
         "user2@mail.com"
       ],
-      "templateId": 2,
+      "template_id": 1,
       "scheduleType": "immediate",
       "createdAt": "2023-10-20T14:30:00.000Z"
     },
@@ -132,7 +132,7 @@ export const data = {
         "user1@mail.com",
         "user2@mail.com"
       ],
-      "templateId": 2,
+      "template_id": 1,
       "scheduleType": "immediate",
       "createdAt": "2023-10-20T15:30:00.000Z"
     },
@@ -145,7 +145,7 @@ export const data = {
         "user1@mail.com",
         "user2@mail.com"
       ],
-      "templateId": 2,
+      "template_id": 1,
       "scheduleType": "immediate",
       "createdAt": "2023-10-20T16:30:00.000Z"
     },
@@ -158,7 +158,7 @@ export const data = {
         "user1@mail.com",
         "user2@mail.com"
       ],
-      "templateId": 2,
+      "template_id": 3,
       "scheduleType": "immediate",
       "createdAt": "2023-10-20T17:30:00.000Z"
     }

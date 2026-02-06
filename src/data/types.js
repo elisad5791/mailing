@@ -1,11 +1,14 @@
 export const scheduleTypes = {
     immediate: {
-        translation: 'Обычная'
+        translation: 'Обычная',
+        icon: 'mdi-arrow-up-bold-outline'
     },
     scheduled: {
-        translation: 'Запланированная'
+        translation: 'Запланированная',
+        icon: 'mdi-clock-outline'
     },
     recurring: {
-        translation: 'Периодическая'
+        translation: 'Периодическая',
+        icon: 'mdi-autorenew'
     },
 };
