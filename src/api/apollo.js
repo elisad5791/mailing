@@ -1,8 +1,13 @@
 import { ApolloClient, HttpLink, InMemoryCache, ApolloLink } from '@apollo/client/core';
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
+import dotenv from 'dotenv';
 
-const httpLink = new HttpLink({ uri: 'http://localhost:8080/graphql/' });
+dotenv.config();
+const baseUrl = process.env.BASE_URL;
+const uri = baseUrl + '/graphql';
+ 
+const httpLink = new HttpLink({ uri: uri });
 const cache = new InMemoryCache();
 
 const authLink = new ApolloLink((operation, forward) => {

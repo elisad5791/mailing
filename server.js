@@ -8,8 +8,6 @@ import bodyParser from 'body-parser';
 import { authMiddleware } from './auth-middleware.js';
 import { WebSocketServer } from 'ws';
 import { createServer } from 'http';
-import path from 'path';
-import { fileURLToPath } from 'url';
 
 dotenv.config();
 const SECRET_KEY = process.env.JWT_SECRET_KEY;
@@ -17,9 +15,6 @@ const SECRET_KEY = process.env.JWT_SECRET_KEY;
 const app = express();
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -69,6 +64,6 @@ wss.on('connection', (ws) => {
 
 const PORT = process.env.PORT;
 server.listen(PORT, () => {
-  console.log(`Server on http://localhost:${PORT}`);
-  console.log(`WebSocket server on ws://localhost:${PORT}`);
+  console.log(`Server on port ${PORT}`);
+  console.log(`WebSocket server on port ${PORT}`);
 });
