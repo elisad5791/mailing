@@ -18,8 +18,7 @@ let socket;
 onMounted(async () => {
   await fetchStats();
 
-  const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-  socket = new WebSocket(`${wsProtocol}//${window.location.host}`);
+  socket = new WebSocket('ws://' + import.meta.env.VITE_SOCKET_URL);
 
   socket.addEventListener('message', async ({ data }) => {
     if (data == 'stat') {
