@@ -1,10 +1,8 @@
 import { ApolloClient, HttpLink, InMemoryCache, ApolloLink } from '@apollo/client/core';
 import { useAuthStore } from '@/stores/auth';
 import { storeToRefs } from 'pinia';
-import dotenv from 'dotenv';
 
-dotenv.config();
-const baseUrl = process.env.BASE_URL;
+const baseUrl = import.meta.env.VITE_API_URL;
 const uri = baseUrl + '/graphql';
  
 const httpLink = new HttpLink({ uri: uri });
