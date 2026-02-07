@@ -14,7 +14,11 @@ const SECRET_KEY = process.env.JWT_SECRET_KEY;
 
 const app = express();
 const server = createServer(app);
-const wss = new WebSocketServer({ server });
+
+const params = process.env.ENV_TYPE == 'dev' 
+  ? { server }
+  : { server, path: '/ws', clientTracking: true };
+const wss = new WebSocketServer(params);
 
 app.use(cors());
 app.use(bodyParser.json());
