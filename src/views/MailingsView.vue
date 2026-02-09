@@ -118,7 +118,7 @@ function handleAction(id) {
               <v-btn size="small" color="error" variant="tonal" @click="handleDelete(mailing.id)" class="ms-2">
                 Удалить
               </v-btn>
-              <v-btn size="small" color="error" variant="tonal" @click="handleAction(mailing.id)" class="ms-2">
+              <v-btn size="small" color="warning" variant="tonal" @click="handleAction(mailing.id)" class="ms-2">
                 {{ statuses[mailing.status]['action'] }}
               </v-btn>
             </td>
