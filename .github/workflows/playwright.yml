@@ -1,9 +1,7 @@
 name: Playwright Tests
 on:
   push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
+    branches: [ main ]
 jobs:
   test:
     timeout-minutes: 60
@@ -13,27 +11,41 @@ jobs:
     - uses: actions/setup-node@v4
       with:
         node-version: lts/*
+
     - name: Install dependencies
       run: npm ci
+
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
-    - name: Start server
-      run: npm run graphql-server
-    - name: Start app
-      run: npm run dev
-    - name: Run Playwright login test
-      run: npx playwright test login.spec.js
-    - name: Run Playwright dashboard test
-      run: npx playwright test dashboard.spec.js
-    - name: Run Playwright mailing webkit test
-      run: npx playwright test mailing.spec.js --project webkit
-    - name: Run Playwright mailing firefox test
-      run: npx playwright test mailing.spec.js --project firefox
-    - name: Run Playwright mailing chromium test
-      run: npx playwright test mailing.spec.js --project chromium
-    - name: Run Playwright template webkit test
-      run: npx playwright test template.spec.js --project webkit
-    - name: Run Playwright template firefox test
-      run: npx playwright test template.spec.js --project firefox
-    - name: Run Playwright template chromium test
-      run: npx playwright test template.spec.js --project chromium
+
+    - name: Start backend server and frontend, then run tests
+      run: |
+        node server.js &
+        BACKEND_PID=$!
+        
+        npx vite preview --port 5173 --host &
+        FRONTEND_PID=$!
+        
+        npx wait-on http://localhost:8080 && echo "Backend is ready"
+        npx wait-on http://localhost:5173 && echo "Frontend is ready"
+        
+        npx playwright test login.spec.js
+
+        npx playwright test dashboard.spec.js
+
+        npx playwright test mailing.spec.js --project webkit
+        npx playwright test mailing.spec.js --project firefox
+        npx playwright test mailing.spec.js --project chromium
+
+        npx playwright test template.spec.js --project webkit
+        npx playwright test template.spec.js --project firefox
+        npx playwright test template.spec.js --project chromium
+
+        kill $BACKEND_PID $FRONTEND_PID
+        
+      env:
+        JWT_SECRET_KEY: qwerty123456789
+        PORT: 8080
+        VITE_API_URL: http://localhost:8080
+        VITE_SOCKET_URL: localhost:8080
+
