@@ -18,15 +18,12 @@ jobs:
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
 
-    - name: Build Vue app
-      run: npm run build
-
     - name: Start backend server and frontend, then run tests
       run: |
         node server.js &
         BACKEND_PID=$!
         
-        npx vite preview --port 5173 --host &
+        npm run dev &
         FRONTEND_PID=$!
         
         echo "Waiting 5 seconds for servers to initialize..."
