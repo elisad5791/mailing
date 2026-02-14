@@ -17,8 +17,10 @@ jobs:
       run: npm ci
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
-    - name: Build app
-      run: npm run build
+    - name: Start server
+      run: npm run graphql-server
+    - name: Start app
+      run: npm run dev
     - name: Run Playwright login test
       run: npx playwright test login.spec.js
     - name: Run Playwright dashboard test
