@@ -15,8 +15,14 @@ jobs:
     - name: Install dependencies
       run: npm ci
 
+    - name: Install wait-on additionally
+      run: npm install --save-dev wait-on
+
     - name: Install Playwright Browsers
       run: npx playwright install --with-deps
+
+    - name: Build Vue app
+      run: npm run build
 
     - name: Start backend server and frontend, then run tests
       run: |

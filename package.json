@@ -32,7 +32,6 @@
     "vue-chartjs": "^5.3.2",
     "vue-router": "^4.5.1",
     "vuetify": "^3.9.7",
-    "wait-on": "^9.0.4",
     "ws": "^8.19.0"
   },
   "devDependencies": {
