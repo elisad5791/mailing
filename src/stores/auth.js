@@ -1,12 +1,16 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { apiClient } from '../api/client.js';
+import { useStatsStore } from './stats.js';
 
 export const useAuthStore = defineStore('auth', function () {
   const user = ref(JSON.parse(localStorage.getItem('user') || null));
   const token = ref(localStorage.getItem('token'));
 
   const isAuthenticated = computed(() => !!token.value)
+
+  const statStore = useStatsStore();
+  const { fetchStats } = statStore;
 
   function setToken(newToken) {
     token.value = newToken;
@@ -32,6 +36,8 @@ export const useAuthStore = defineStore('auth', function () {
     const { token: newToken, user: userData } = response.data;
     setToken(newToken);
     setUser(userData);
+
+    await fetchStats();
     
     return response;
   };
