@@ -45,6 +45,13 @@ jobs:
         npx playwright test template.spec.js --project chromium
 
         kill $BACKEND_PID $FRONTEND_PID
+
+    - uses: actions/upload-artifact@v4
+      if: ${{ !cancelled() }}
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
         
       env:
         JWT_SECRET_KEY: qwerty123456789
