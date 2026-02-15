@@ -27,3 +27,5 @@ jobs:
           npm install
           npm run build
           pm2 restart gql
+          rm .env
+          cp .env.exapmle .env
