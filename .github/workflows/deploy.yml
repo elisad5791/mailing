@@ -24,8 +24,8 @@ jobs:
         script: |
           cd /var/www/elisad5791.fvds.ru
           git pull origin main
+          rm .env
+          cp .env.example .env
           npm install
           npm run build
           pm2 restart gql
-          rm .env
-          cp .env.example .env
