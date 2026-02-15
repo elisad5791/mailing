@@ -25,7 +25,6 @@ app.use(bodyParser.json());
 app.use(authMiddleware());
 
 app.post('/login', (req, res) => {
-  console.log('login');
   const { email, password } = req.body;
   const user = data.users.find(u => u.email === email && u.password === password);
 
