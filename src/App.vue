@@ -21,7 +21,6 @@ onMounted(async () => {
   socket = new WebSocket('ws://' + import.meta.env.VITE_SOCKET_URL);
 
   socket.addEventListener('message', async ({ data }) => {
-    alert('stat');
     if (data == 'stat') {
       await fetchStats();
     }
