@@ -2,12 +2,15 @@ import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import { apolloClient }  from '../api/apollo.js';
 import gql from 'graphql-tag';
+import { useRouter } from 'vue-router';
 
 export const useTemplatesStore = defineStore('templates', function() {
   const templates = ref([]);
   const currentTemplate = ref(null);
   const isLoading = ref(false);
   const error = ref(null);
+
+  const router = useRouter();
 
   const emailTemplates = computed(() => {
     return templates.value.filter(template => template.type === 'email');
@@ -42,6 +45,8 @@ export const useTemplatesStore = defineStore('templates', function() {
       templates.value = [...data.allTemplates].sort((a, b) => {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
+    } catch (err) {
+      processError(err);
     } finally {
       isLoading.value = false;
     }
@@ -71,6 +76,8 @@ export const useTemplatesStore = defineStore('templates', function() {
         fetchPolicy: 'network-only' 
       });
       currentTemplate.value = result.data.Template;
+    } catch (err) {
+      processError(err);
     } finally {
       isLoading.value = false;
     }
@@ -92,6 +99,8 @@ export const useTemplatesStore = defineStore('templates', function() {
         mutation: deleteTemplateMutation, 
         variables: { id }
       });
+    } catch (err) {
+      processError(err);
     } finally {
       isLoading.value = false;
     }
@@ -140,6 +149,8 @@ export const useTemplatesStore = defineStore('templates', function() {
       });
       
       await fetchTemplates();
+    } catch (err) {
+      processError(err);
     } finally {
       isLoading.value = false;
     }
@@ -185,9 +196,19 @@ export const useTemplatesStore = defineStore('templates', function() {
       if (currentTemplate.value?.id === id) {
         currentTemplate.value = { ...currentTemplate.value, ...result.data.updateTemplate };
       }
+    } catch (err) {
+      processError(err);
     } finally {
       isLoading.value = false;
     }
+  }
+
+  function processError(err) {
+    if (err.statusCode == 401) {
+        router.push('/login');
+      } else {
+        error.value = err.bodyText;
+      }
   }
 
   return { 

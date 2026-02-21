@@ -2,12 +2,15 @@ import { defineStore } from 'pinia';
 import { apolloClient }  from '../api/apollo.js';
 import { ref } from 'vue';
 import gql from 'graphql-tag';
+import { useRouter } from 'vue-router';
 
 export const useMailingsStore = defineStore('mailings', function () {
   const mailings = ref([]);
   const currentMailing = ref(null);
   const loading = ref(false);
   const error = ref(null);
+
+  const router = useRouter();
 
   async function fetchMailings() {
     loading.value = true;
@@ -38,6 +41,8 @@ export const useMailingsStore = defineStore('mailings', function () {
       mailings.value = [...data.allMailings].sort((a, b) => {
         return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
       });
+    } catch (err) {
+      processError(err);
     } finally {
       loading.value = false;
     }
@@ -74,6 +79,8 @@ export const useMailingsStore = defineStore('mailings', function () {
         fetchPolicy: 'network-only' 
       });
       currentMailing.value = result.data.Mailing;
+    } catch (err) {
+      processError(err);
     } finally {
       loading.value = false;
     }
@@ -100,6 +107,8 @@ export const useMailingsStore = defineStore('mailings', function () {
       if (currentMailing.value?.id === id) {
         currentMailing.value = null;
       }
+    } catch (err) {
+      processError(err);
     } finally {
       loading.value = false;
     }
@@ -156,6 +165,8 @@ export const useMailingsStore = defineStore('mailings', function () {
       });
       
       await fetchMailings();
+    } catch (err) {
+      processError(err);
     } finally {
       loading.value = false;
     }
@@ -216,9 +227,19 @@ export const useMailingsStore = defineStore('mailings', function () {
       }
       
       await fetchMailings();
+    } catch (err) {
+      processError(err);
     } finally {
       loading.value = false;
     }
+  }
+
+  function processError(err) {
+    if (err.statusCode == 401) {
+        router.push('/login');
+      } else {
+        error.value = err.bodyText;
+      }
   }
 
   return { 

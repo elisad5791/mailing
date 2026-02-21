@@ -41,11 +41,7 @@ export const useStatsStore = defineStore('stats', function () {
       });
       stats.value = data.allStats[0];
     } catch (err) {
-      if (err.statusCode == 401) {
-        router.push('/login');
-      } else {
-        error.value = err.bodyText;
-      }
+      processError(err);
     } finally {
       isLoading.value = false;
     } 
@@ -120,9 +116,19 @@ export const useStatsStore = defineStore('stats', function () {
       });
       
       await fetchStats();
+    } catch (err) {
+      processError(err);
     } finally {
       isLoading.value = false;
     }
+  }
+
+  function processError(err) {
+    if (err.statusCode == 401) {
+        router.push('/login');
+      } else {
+        error.value = err.bodyText;
+      }
   }
 
   return { stats, isLoading, error, fetchStats, updateStat };
