@@ -2,6 +2,7 @@ import { defineStore } from 'pinia';
 import { apolloClient }  from '../api/apollo.js';
 import { ref } from 'vue';
 import gql from 'graphql-tag';
+import { useRouter } from 'vue-router';
 
 export const useStatsStore = defineStore('stats', function () {
   const stats = ref({
@@ -13,6 +14,8 @@ export const useStatsStore = defineStore('stats', function () {
   });
   const isLoading = ref(false);
   const error = ref(null);
+
+  const router = useRouter();
 
   async function fetchStats() {
     isLoading.value = true;
@@ -37,6 +40,12 @@ export const useStatsStore = defineStore('stats', function () {
         fetchPolicy: 'network-only' 
       });
       stats.value = data.allStats[0];
+    } catch (err) {
+      if (err.statusCode == 401) {
+        router.push('/login');
+      } else {
+        error.value = err.bodyText;
+      }
     } finally {
       isLoading.value = false;
     } 
